@@ -146,8 +146,8 @@ public class Ghost implements Collidable {
         LinkedList Q = new LinkedList<BoardCoordinate>();
 
         BoardCoordinate closestCoordinate = null;
-        //Direction[][] directions = new Direction[Constants.MAZE_DIMENSION][Constants.MAZE_DIMENSION];
-        Direction[][] directions = null;
+        Direction[][] directions = new Direction[Constants.MAZE_DIMENSION][Constants.MAZE_DIMENSION];
+        //Direction[][] directions = null;
 
         double smallestDistance = 10000000;
 
