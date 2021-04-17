@@ -20,13 +20,14 @@ public class Game {
     private Direction _blinkyDirection;
     private BoardCoordinate _pacmanCoordinate;
     private BoardCoordinate _blinkyCoordinate;
-
     private int _score;
     private Sidebar _sidebar;
     private Ghost _blinky;
+    private Mode _mode;
+
 
     public Game(Pane boardPane, Sidebar sidebar) {
-
+        _mode = Mode.CHASE;
         _boardPane = boardPane;
         _sidebar = sidebar;
         this.setUpBoard();
@@ -128,7 +129,6 @@ public class Game {
                     break;
                 case DOWN:
                     _pacmanDirection = Direction.DOWN;
-                   // _direction = _direction.opposite();
                     break;
                 case UP:
                     _pacmanDirection = Direction.UP;
@@ -167,10 +167,28 @@ public class Game {
             _pacman.move(_pacmanDirection);
             this.checkForCollision();
 
-            _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, _pacmanCoordinate);
-            _blinky.move(_blinkyDirection);
+            if(!_blinky.isCollided()){
 
-            this.checkForCollision();
+
+                if(_mode==Mode.CHASE){
+                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, _pacmanCoordinate);
+                    _blinky.move(_blinkyDirection);
+
+                } else if (_mode==Mode.SCATTER){
+                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, new BoardCoordinate(1,1, false));
+                    _blinky.move(_blinkyDirection);
+
+                } else if (_mode == Mode.FRIGHTENED){
+                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, _pacmanCoordinate);
+                    _blinky.move(_blinkyDirection);
+                }
+
+
+                this.checkForCollision();
+            }
+
+
+
 
             _sidebar.updateScoreLabel(_score);
         }

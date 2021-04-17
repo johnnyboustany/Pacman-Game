@@ -1,11 +1,8 @@
 package pacman;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
-import java.lang.reflect.Array;
 import java.util.LinkedList;
 
 public class Ghost implements Collidable {
@@ -14,10 +11,11 @@ public class Ghost implements Collidable {
     private Color _color;
     private Pane _boardPane;
     private MazeSquare[][] _map;
+    private boolean _collided;
 
 
     public Ghost(String ghostName, Pane boardPane, MazeSquare[][] map) {
-
+        _collided = false;
         _boardPane = boardPane;
         _map = map;
 
@@ -47,11 +45,16 @@ public class Ghost implements Collidable {
         _ghost.setX(col * Constants.SQUARE_WIDTH);
     }
 
+
+
+    public boolean isCollided() {
+        return _collided;
+    }
+
     @Override
     public void collide() {
         this.removeFromPane(_boardPane);
-
-
+        _collided = true;
     }
 
     @Override
@@ -93,7 +96,7 @@ public class Ghost implements Collidable {
                 break;
             case RIGHT: rowOffset = 0; colOffset = 1;
                 break;
-            case NULL: rowOffset = 0; colOffset = 0;
+            default: rowOffset = 0; colOffset = 0;
                 break;
         }
 
@@ -128,7 +131,7 @@ public class Ghost implements Collidable {
                 break;
             case RIGHT: rowOffset = 0; colOffset = 1;
                 break;
-            case NULL: rowOffset = 0; colOffset = 0;
+            default: rowOffset = 0; colOffset = 0;
                 break;
         }
 
@@ -143,13 +146,12 @@ public class Ghost implements Collidable {
     }
 
     public Direction ghostBFS(BoardCoordinate ghostCoordinate, Direction ghostDirection, BoardCoordinate targetCoordinate){
-        LinkedList Q = new LinkedList<BoardCoordinate>();
+        LinkedList<BoardCoordinate> Q = new LinkedList<>();
 
         BoardCoordinate closestCoordinate = null;
         Direction[][] directions = new Direction[Constants.MAZE_DIMENSION][Constants.MAZE_DIMENSION];
-        //Direction[][] directions = null;
 
-        double smallestDistance = 10000000;
+        double smallestDistance = Double.POSITIVE_INFINITY;
 
         int ghostRow = ghostCoordinate.getRow();
         int ghostColumn = ghostCoordinate.getColumn();
@@ -169,31 +171,41 @@ public class Ghost implements Collidable {
             directions[ghostRow][ghostColumn] = directions[ghostRow-1][ghostColumn] ;
         }
 
-        if(!_map[ghostRow][ghostColumn+1].isWall() && ghostDirection.opposite() != Direction.RIGHT){
+        if(ghostColumn+1 < 22 && !(_map[ghostRow][ghostColumn+1].isWall()) && ghostDirection.opposite() != Direction.RIGHT){
             System.out.println("in iffy3");
 
-            Q.addLast(new BoardCoordinate(ghostRow,ghostColumn+1, false));
-            directions[ghostRow][ghostColumn+1] = Direction.RIGHT;
-            directions[ghostRow][ghostColumn] = directions[ghostRow][ghostColumn+1] ;
+              Q.addLast(new BoardCoordinate(ghostRow,ghostColumn+1, false));
+              directions[ghostRow][ghostColumn+1] = Direction.RIGHT;
+              directions[ghostRow][ghostColumn] = Direction.RIGHT;
         }
 
-        if(!_map[ghostRow][ghostColumn-1].isWall() && ghostDirection.opposite() != Direction.LEFT){
+        if(ghostColumn+1 == 22 && !(_map[ghostRow][ghostColumn+1].isWall()) && ghostDirection.opposite() != Direction.RIGHT){
+            System.out.println("in iffy3-");
+            Q.addLast(new BoardCoordinate(ghostRow,0, false));
+            directions[ghostRow][0] = Direction.RIGHT;
+            directions[ghostRow][ghostColumn] = Direction.RIGHT;
+        }
+
+
+        if(ghostColumn-1 > 0 && !_map[ghostRow][ghostColumn-1].isWall() && ghostDirection.opposite() != Direction.LEFT){
+            System.out.println("in iffy4");
+            Q.addLast(new BoardCoordinate(ghostRow,ghostColumn-1, false));
+             directions[ghostRow][ghostColumn-1] = Direction.LEFT;
+
+            directions[ghostRow][ghostColumn] = Direction.LEFT;
+        }
+
+        if(ghostColumn-1 == 0 && !_map[ghostRow][ghostColumn-1].isWall() && ghostDirection.opposite() != Direction.LEFT){
             System.out.println("in iffy4");
 
-            //if(ghostRow != 0){
-                Q.addLast(new BoardCoordinate(ghostRow,ghostColumn-1, false));
-                directions[ghostRow][ghostColumn-1] = Direction.LEFT;
-
-          //  } else {
-           //     Q.addLast(new BoardCoordinate(ghostRow,22, false));
-            //    directions[ghostRow][22] = Direction.LEFT;
-            //}
-                directions[ghostRow][ghostColumn] = directions[ghostRow][ghostColumn-1];
+            Q.addLast(new BoardCoordinate(ghostRow,22, false));
+            directions[ghostRow][22] = Direction.LEFT;
+            directions[ghostRow][ghostColumn] = Direction.LEFT;
         }
 
         while(!Q.isEmpty()){
             System.out.println("in while loop");
-            BoardCoordinate currentCoordinate = (BoardCoordinate) Q.removeFirst();
+            BoardCoordinate currentCoordinate = Q.removeFirst();
 
             int xTarget = targetCoordinate.getColumn() * Constants.SQUARE_WIDTH;
             int yTarget = targetCoordinate.getRow() * Constants.SQUARE_WIDTH;
@@ -209,34 +221,50 @@ public class Ghost implements Collidable {
             int currentRow = currentCoordinate.getRow();
             int currentColumn = currentCoordinate.getColumn();
 
-            if(!(_map[currentRow+1][currentColumn].isWall()) && directions[currentRow+1][currentColumn]== null){
+            if(currentColumn < 22 && currentColumn > 0 && currentRow+1 < 22 && currentRow+1 > 0 && !(_map[currentRow+1][currentColumn].isWall()) && directions[currentRow+1][currentColumn]== null ){
                 System.out.println("in if1");
+                Q.addLast(new BoardCoordinate(currentRow+1,currentColumn, false));
 
                 directions[currentRow+1][currentColumn] = directions[currentRow][currentColumn];
-                Q.addLast(new BoardCoordinate(ghostRow+1,ghostColumn, false));
             }
 
-            if(!(_map[currentRow-1][currentColumn].isWall()) && directions[currentRow-1][currentColumn] == null){
+            if(currentColumn < 22 && currentColumn > 0 && currentRow-1 < 22 && currentRow-1 > 0 && !(_map[currentRow-1][currentColumn].isWall()) && directions[currentRow-1][currentColumn] == null){
                 System.out.println("in if2");
+                Q.addLast(new BoardCoordinate(currentRow-1,currentColumn, false));
 
                 directions[currentRow-1][currentColumn] =  directions[currentRow][currentColumn];
-                Q.addLast(new BoardCoordinate(ghostRow-1,ghostColumn, false));
             }
 
-            if(!(_map[currentRow][currentColumn+1].isWall()) && directions[currentRow][currentColumn+1] == null){
+            if( currentColumn+1 < 22 && !(_map[currentRow][currentColumn+1].isWall()) && directions[currentRow][currentColumn+1] == null){
                 System.out.println("in if3");
+                Q.addLast(new BoardCoordinate(currentRow,currentColumn+1, false));
 
                 directions[currentRow][currentColumn+1] =  directions[currentRow][currentColumn];
-                Q.addLast(new BoardCoordinate(ghostRow,ghostColumn+1, false));
             }
 
-            if(!(_map[currentRow][currentColumn-1].isWall()) && directions[currentRow][currentColumn-1] == null){
+            if( currentColumn+1 == 22 && !(_map[currentRow][currentColumn+1].isWall()) && directions[currentRow][currentColumn+1] == null){
+                System.out.println("in if34");
+                Q.addLast(new BoardCoordinate(currentRow,0, false));
+
+                directions[currentRow][0] =  directions[currentRow][currentColumn];
+            }
+
+            if(currentColumn-1 > 0  && !(_map[currentRow][currentColumn-1].isWall()) && directions[currentRow][currentColumn-1] == null){
                 System.out.println("in if4");
+                Q.addLast(new BoardCoordinate(currentRow,currentColumn-1, false));
 
-                directions[currentRow][currentColumn-1] =  directions[currentRow][currentColumn];
-                Q.addLast(new BoardCoordinate(ghostRow,ghostColumn-1, false));
+                directions[currentRow][currentColumn-1] = directions[currentRow][currentColumn];
             }
+
+            if(currentColumn-1 == 0 && !(_map[currentRow][currentColumn-1].isWall()) && directions[currentRow][currentColumn-1] == null){
+                System.out.println("in if4");
+                Q.addLast(new BoardCoordinate(currentRow,22, false));
+
+                directions[currentRow][22] =  directions[currentRow][currentColumn];
+            }
+
         }
+        assert closestCoordinate != null;
         return directions[closestCoordinate.getRow()][closestCoordinate.getColumn()];
     }
 }
