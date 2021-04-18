@@ -37,11 +37,14 @@ public class Game {
     private int _scatterCounter;
     private int _chaseCounter;
     private int _frightenedCounter;
+    private boolean _frightenedMode;
+    private boolean _scatterMode;
+    private boolean _chasseMode;
 
     public Game(Pane boardPane, Sidebar sidebar) {
+        _frightenedMode = false;
         _modeCounter = 0;
-        //_mode = Mode.SCATTER;
-        _mode = Mode.FRIGHTENED;
+        _mode = Mode.SCATTER;
         _boardPane = boardPane;
         _sidebar = sidebar;
         this.setUpBoard();
@@ -53,7 +56,6 @@ public class Game {
         _pinkyDirection = Direction.RIGHT;
         _clydeDirection = Direction.RIGHT;
         _inkyDirection = Direction.RIGHT;
-
 
         this.setUpTimeline();
 
@@ -147,16 +149,24 @@ public class Game {
         public void handle(KeyEvent keyEvent) {
             switch (keyEvent.getCode()) {
                 case LEFT:
-                    _pacmanDirection = Direction.LEFT;
+                    if(_pacman.moveIsValid(0,-1)){
+                        _pacmanDirection = Direction.LEFT;
+                    }
                     break;
                 case RIGHT:
-                    _pacmanDirection = Direction.RIGHT;
+                    if(_pacmanCoordinate.getColumn() < 21 && _pacman.moveIsValid(0,1)){
+                        _pacmanDirection = Direction.RIGHT;
+                    }
                     break;
                 case DOWN:
-                    _pacmanDirection = Direction.DOWN;
+                    if(_pacman.moveIsValid(1,0)){
+                        _pacmanDirection = Direction.DOWN;
+                    }
                     break;
                 case UP:
-                    _pacmanDirection = Direction.UP;
+                    if(_pacman.moveIsValid(-1,0)){
+                        _pacmanDirection = Direction.UP;
+                    }
                     break;
             }
             keyEvent.consume();
@@ -186,21 +196,63 @@ public class Game {
          */
         public void handle(ActionEvent event) {
 
-           // _modeCounter++;
+            if(!_frightenedMode){
 
-            //different counters for each mode
+                if(!_blinky.isCollided()){
+                    _blinky.changeBackColor();
+                }
+                if(!_clyde.isCollided()){
+                    _clyde.changeBackColor();
+                }
 
-          //  if(_modeCounter == 32){
-            //    _mode = Mode.CHASE;
-           // }
+                if(!_pinky.isCollided()){
+                    _pinky.changeBackColor();
+                }
+                if(!_inky.isCollided()){
+                    _inky.changeBackColor();
+                }
 
-           // if(_modeCounter == 32+80){
-           //     _mode = Mode.SCATTER;
-          //      _modeCounter = 0;
-          //  }
+               _modeCounter++;
 
-            _blinkyCoordinate = new BoardCoordinate(_blinky.getRowLocation(), _blinky.getColLocation(), false);
+                if(_modeCounter == 32){
+                    _mode = Mode.CHASE;
+                }
+
+                if(_modeCounter == 32+80){
+                    _mode = Mode.SCATTER;
+                    _modeCounter = 0;
+                }
+
+           } else {
+
+                if(!_blinky.isCollided()){
+                    _blinky.changeColor(Color.CYAN);
+                }
+                if(!_clyde.isCollided()){
+                    _clyde.changeColor(Color.CYAN);
+                }
+
+                if(!_pinky.isCollided()){
+                    _pinky.changeColor(Color.CYAN);
+                }
+                if(!_inky.isCollided()){
+                    _inky.changeColor(Color.CYAN);
+                }
+
+               _mode = Mode.FRIGHTENED;
+
+               _frightenedCounter++;
+
+               if(_frightenedCounter == 32){
+                   _frightenedCounter = 0;
+                   _modeCounter = 0;
+                   _frightenedMode = false;
+               }
+           }
+
+
             _pacmanCoordinate = new BoardCoordinate(_pacman.getRowLocation(), _pacman.getColLocation(), false);
+            _blinkyCoordinate = new BoardCoordinate(_blinky.getRowLocation(), _blinky.getColLocation(), false);
             _pinkyCoordinate = new BoardCoordinate(_pinky.getRowLocation(), _pinky.getColLocation(), false);
             _clydeCoordinate = new BoardCoordinate(_clyde.getRowLocation(), _clyde.getColLocation(), false);
             _inkyCoordinate = new BoardCoordinate(_inky.getRowLocation(), _inky.getColLocation(), false);
@@ -283,28 +335,45 @@ public class Game {
 
             for (int i = 0; i < currentSquare.getSquareElements().size(); i++) {
                 if (currentSquare.containsDot(i) || currentSquare.containsEnergizer(i) || currentSquare.containsGhost(i)) {
-                    currentSquare.getCollidable(i).collide();
-                    this.incrementScore(currentSquare,i);
+                        currentSquare.getCollidable(i).collide();
+                        this.incrementScore(currentSquare,i);
                 }
              }
-
-            currentSquare.getSquareElements().clear();
+                currentSquare.getSquareElements().clear();
         }
 
         public void incrementScore(MazeSquare currentSquare, int i ){
-
             if(currentSquare.containsDot(i)){
                 _score = _score+10;
             }
-
             if(currentSquare.containsEnergizer(i)){
+
+                _frightenedMode = true;
                 _score = _score+100;
             }
-
             if(currentSquare.containsGhost(i)){
-                _score = _score+200;
+
+                if(_frightenedMode){
+                    _score = _score+200;
+
+                } else {
+
+                    //resetGame();
+                }
             }
         }
+
+        public void resetGame(){
+
+            _pacman.setLocation(17,11);
+            _blinky.setLocation(8,11);
+            _pinky.setLocation(10,10);
+            _clyde.setLocation(10,10);
+            _inky.setLocation(10,10);
+        }
+
+
+
     }
 }
 

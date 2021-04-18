@@ -22,6 +22,8 @@ public class Energizer implements Collidable{
     public void collide() {
         _boardPane.getChildren().remove(_energizer);
 
+
+
     }
 
     @Override

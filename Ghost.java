@@ -45,6 +45,12 @@ public class Ghost implements Collidable {
         _ghost.setFill(color);
     }
 
+    public void changeBackColor(){
+        _ghost.setFill(_color);
+    }
+
+
+
     public void setLocation(int row, int col) {
 
         _ghost.setY(row * Constants.SQUARE_WIDTH);
@@ -93,11 +99,11 @@ public class Ghost implements Collidable {
         int rowOffset = direction.getRowOffset();
         int colOffset = direction.getColOffset();
 
-
         if(this.getColLocation() + colOffset >= 0 && this.getColLocation() + colOffset <= 22) {
             if (moveIsValid(rowOffset, colOffset)) {
                 _map[this.getRowLocation()][this.getColLocation()].getSquareElements().remove(this);
                 _map[this.getRowLocation() + rowOffset][this.getColLocation() + colOffset].getSquareElements().add(this);
+
                 this.setLocation(this.getRowLocation() + rowOffset, this.getColLocation() + colOffset);
             }
 
@@ -165,7 +171,7 @@ public class Ghost implements Collidable {
         randomDirection = _validDirections.get(randInt);
         _validDirections.clear();
 
-        //this.changeColor(Color.LIGHTBLUE);
+
 
         return randomDirection;
     }

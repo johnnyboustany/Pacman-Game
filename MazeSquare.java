@@ -83,7 +83,7 @@ public class MazeSquare {
     }
 
     public boolean containsGhost(int i) {
-        if (_squareElements.get(i).getType() == "ghost") {
+        if (_squareElements.get(i).getType().equals("ghost")) {
             return true;
         } else {
             return false;
@@ -93,6 +93,7 @@ public class MazeSquare {
     public Collidable getCollidable(int i) {
         return _squareElements.get(i);
     }
+
 
 
 }
