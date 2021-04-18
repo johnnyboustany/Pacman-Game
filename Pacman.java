@@ -22,21 +22,8 @@ public class Pacman {
     }
 
     public void move(Direction direction){
-        int rowOffset = 0;
-        int colOffset = 0;
-
-        switch(direction){
-            case UP: rowOffset = -1; colOffset = 0;
-                break;
-            case DOWN: rowOffset = 1; colOffset = 0;
-                break;
-            case LEFT: rowOffset = 0; colOffset = -1;
-                break;
-            case RIGHT: rowOffset = 0; colOffset = 1;
-                break;
-            default: rowOffset = 0; colOffset = 0;
-                break;
-        }
+        int rowOffset = direction.getRowOffset();
+        int colOffset = direction.getColOffset();
 
         if(this.getColLocation() + colOffset >= 0 && this.getColLocation() + colOffset <= 22){
 
@@ -57,8 +44,6 @@ public class Pacman {
         }
 
     public boolean moveIsValid(int rowOffset, int colOffset){
-
-        //direction
 
         int yLocation = (this.getRowLocation() + rowOffset)*Constants.SQUARE_WIDTH+(Constants.SQUARE_WIDTH/2);
         int xLocation = (this.getColLocation() + colOffset)*Constants.SQUARE_WIDTH+(Constants.SQUARE_WIDTH/2);

@@ -10,7 +10,7 @@ public class Constants {
 
     public static final int SQUARE_WIDTH = 30; // (UNITS: pixels)
 
-    public static final double DURATION = 0.25; //
+    public static final double DURATION = 0.25; // (s)
 
 
 
