@@ -6,9 +6,11 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 public class Game {
@@ -34,22 +36,18 @@ public class Game {
     private Ghost _clyde;
     private Mode _mode;
     private int _modeCounter;
-    private int _scatterCounter;
-    private int _chaseCounter;
     private int _frightenedCounter;
     private boolean _frightenedMode;
-    private boolean _scatterMode;
-    private boolean _chasseMode;
+    public GhostPen _pen;
+    private  int _lives;
+    private boolean _outOfLives;
 
     public Game(Pane boardPane, Sidebar sidebar) {
-        _frightenedMode = false;
-        _modeCounter = 0;
-        _mode = Mode.SCATTER;
         _boardPane = boardPane;
         _sidebar = sidebar;
         this.setUpBoard();
 
-        new GhostPen(_blinky, _pinky, _clyde, _inky);
+        _pen = new GhostPen(_blinky, _pinky, _clyde, _inky,this);
 
         _pacmanDirection = Direction.INITIAL;
         _blinkyDirection = Direction.RIGHT;
@@ -57,33 +55,31 @@ public class Game {
         _clydeDirection = Direction.RIGHT;
         _inkyDirection = Direction.RIGHT;
 
-        this.setUpTimeline();
+        _mode = Mode.CHASE;
+        _outOfLives = false;
+        _frightenedMode = false;
+        _modeCounter = 0;
+        _lives = 3;
+        _score = 0;
 
+        this.setUpTimeline();
         _boardPane.addEventHandler(KeyEvent.KEY_PRESSED, new KeyHandler());
         _boardPane.setFocusTraversable(true);
-
-        _score = 0;
     }
 
     public void setUpBoard() {
-
         SquareType[][] supportMap = cs15.fnl.pacmanSupport.SupportMap.getSupportMap();
         _map = new MazeSquare[Constants.MAZE_DIMENSION][Constants.MAZE_DIMENSION];
 
         for (int row = 0; row < Constants.MAZE_DIMENSION; row++) {
             for (int col = 0; col < Constants.MAZE_DIMENSION; col++) {
-
                 MazeSquare square = new MazeSquare();
 
                 square.setXLocation(col * Constants.SQUARE_WIDTH);
                 square.setYLocation(row * Constants.SQUARE_WIDTH);
 
                 _map[row][col] = square;
-            }
-        }
 
-        for (int row = 0; row < Constants.MAZE_DIMENSION; row++) {
-            for (int col = 0; col < Constants.MAZE_DIMENSION; col++) {
                 switch (supportMap[row][col]) {
                     case DOT:
                         Dot dot = new Dot(_boardPane);
@@ -101,7 +97,7 @@ public class Game {
             }
         }
 
-                for (int row = 0; row < Constants.MAZE_DIMENSION; row++) {
+        for (int row = 0; row < Constants.MAZE_DIMENSION; row++) {
             for (int col = 0; col < Constants.MAZE_DIMENSION; col++) {
 
                 switch (supportMap[row][col]) {
@@ -143,33 +139,35 @@ public class Game {
     private class KeyHandler implements EventHandler<KeyEvent> {
 
         public KeyHandler() {
-
         }
 
         public void handle(KeyEvent keyEvent) {
-            switch (keyEvent.getCode()) {
-                case LEFT:
-                    if(_pacman.moveIsValid(0,-1)){
-                        _pacmanDirection = Direction.LEFT;
-                    }
-                    break;
-                case RIGHT:
-                    if(_pacmanCoordinate.getColumn() < 21 && _pacman.moveIsValid(0,1)){
-                        _pacmanDirection = Direction.RIGHT;
-                    }
-                    break;
-                case DOWN:
-                    if(_pacman.moveIsValid(1,0)){
-                        _pacmanDirection = Direction.DOWN;
-                    }
-                    break;
-                case UP:
-                    if(_pacman.moveIsValid(-1,0)){
-                        _pacmanDirection = Direction.UP;
-                    }
-                    break;
+
+            if(!gameIsOver()){
+                switch (keyEvent.getCode()) {
+                    case LEFT:
+                        if(_pacmanCoordinate.getColumn() > 1 &&_pacman.moveIsValid(0,-1)){
+                            _pacmanDirection = Direction.LEFT;
+                        }
+                        break;
+                    case RIGHT:
+                        if(_pacmanCoordinate.getColumn() < 21 && _pacman.moveIsValid(0,1)){
+                            _pacmanDirection = Direction.RIGHT;
+                        }
+                        break;
+                    case DOWN:
+                        if(_pacman.moveIsValid(1,0)){
+                            _pacmanDirection = Direction.DOWN;
+                        }
+                        break;
+                    case UP:
+                        if(_pacman.moveIsValid(-1,0)){
+                            _pacmanDirection = Direction.UP;
+                        }
+                        break;
+                }
+                keyEvent.consume();
             }
-            keyEvent.consume();
         }
     }
 
@@ -195,136 +193,108 @@ public class Game {
          * clears full lines, and checks if the game is over.
          */
         public void handle(ActionEvent event) {
+            if(gameIsOver()){
+                _pacman.setLocation(17,11);
+                _blinky.setLocation(8,11);
+                _pinky.setLocation(10,10);
+                _inky.setLocation(10,11);
+                _clyde.setLocation(10,12);
 
-            if(!_frightenedMode){
+                this.setUpGameIsOverLabel();
+                _timeline.stop();
 
-                if(!_blinky.isCollided()){
-                    _blinky.changeBackColor();
-                }
-                if(!_clyde.isCollided()){
-                    _clyde.changeBackColor();
-                }
+            } else {
+                this.setMode();
 
-                if(!_pinky.isCollided()){
-                    _pinky.changeBackColor();
-                }
-                if(!_inky.isCollided()){
-                    _inky.changeBackColor();
-                }
+                _pacmanCoordinate = new BoardCoordinate(_pacman.getRowLocation(), _pacman.getColLocation(), false);
+                _blinkyCoordinate = new BoardCoordinate(_blinky.getRowLocation(), _blinky.getColLocation(), false);
+                _pinkyCoordinate = new BoardCoordinate(_pinky.getRowLocation(), _pinky.getColLocation(), false);
+                _clydeCoordinate = new BoardCoordinate(_clyde.getRowLocation(), _clyde.getColLocation(), false);
+                _inkyCoordinate = new BoardCoordinate(_inky.getRowLocation(), _inky.getColLocation(), false);
 
-               _modeCounter++;
-
-                if(_modeCounter == 32){
-                    _mode = Mode.CHASE;
-                }
-
-                if(_modeCounter == 32+80){
-                    _mode = Mode.SCATTER;
-                    _modeCounter = 0;
-                }
-
-           } else {
-
-                if(!_blinky.isCollided()){
-                    _blinky.changeColor(Color.CYAN);
-                }
-                if(!_clyde.isCollided()){
-                    _clyde.changeColor(Color.CYAN);
-                }
-
-                if(!_pinky.isCollided()){
-                    _pinky.changeColor(Color.CYAN);
-                }
-                if(!_inky.isCollided()){
-                    _inky.changeColor(Color.CYAN);
-                }
-
-               _mode = Mode.FRIGHTENED;
-
-               _frightenedCounter++;
-
-               if(_frightenedCounter == 32){
-                   _frightenedCounter = 0;
-                   _modeCounter = 0;
-                   _frightenedMode = false;
-               }
-           }
-
-
-            _pacmanCoordinate = new BoardCoordinate(_pacman.getRowLocation(), _pacman.getColLocation(), false);
-            _blinkyCoordinate = new BoardCoordinate(_blinky.getRowLocation(), _blinky.getColLocation(), false);
-            _pinkyCoordinate = new BoardCoordinate(_pinky.getRowLocation(), _pinky.getColLocation(), false);
-            _clydeCoordinate = new BoardCoordinate(_clyde.getRowLocation(), _clyde.getColLocation(), false);
-            _inkyCoordinate = new BoardCoordinate(_inky.getRowLocation(), _inky.getColLocation(), false);
-
-            _pacman.move(_pacmanDirection);
-            this.checkForCollision();
+                _pacman.move(_pacmanDirection);
+                this.checkForCollision();
 
                 if(_mode==Mode.CHASE){
-                    if(!_blinky.isCollided()){
-                        _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection,_pacmanCoordinate);
-                        _blinky.move(_blinkyDirection);
-                    }
+                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection,_pacmanCoordinate);
+                    _blinky.move(_blinkyDirection);
 
-                    if(!_pinky.isCollided()){
-                        _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(_pacman.getRowLocation()+1,_pacman.getColLocation()-3, true));
-                        _pinky.move(_pinkyDirection);
-                    }
+                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(_pacman.getRowLocation()+1,_pacman.getColLocation()-3, true));
+                    _pinky.move(_pinkyDirection);
 
-                    if(!_clyde.isCollided()){
-                        _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(_pacman.getRowLocation()-4,_pacman.getColLocation(), true));
-                        _clyde.move(_clydeDirection);
-                    }
+                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(_pacman.getRowLocation()-4,_pacman.getColLocation(), true));
+                    _clyde.move(_clydeDirection);
 
-                    if(!_inky.isCollided()){
-                        _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(_pacman.getRowLocation(),_pacman.getColLocation()+2,true));
-                        _inky.move(_inkyDirection);
-                    }
+                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(_pacman.getRowLocation(),_pacman.getColLocation()+2,true));
+                    _inky.move(_inkyDirection);
 
                 } else if (_mode==Mode.SCATTER){
+                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, new BoardCoordinate(0,0, true));
+                    _blinky.move(_blinkyDirection);
 
-                    if(!_blinky.isCollided()){
-                        _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, new BoardCoordinate(0,0, true));
-                        _blinky.move(_blinkyDirection);
-                    }
-                    if(!_pinky.isCollided()){
-                        _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(0,23, true));
-                        _pinky.move(_pinkyDirection);
-                    }
-                    if(!_clyde.isCollided()){
-                        _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(23,0, true));
-                        _clyde.move(_clydeDirection);
-                    }
-                    if(!_inky.isCollided()){
-                        _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(23,23, true));
-                        _inky.move(_inkyDirection);
-                    }
+                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(0,23, true));
+                    _pinky.move(_pinkyDirection);
+
+                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(23,0, true));
+                    _clyde.move(_clydeDirection);
+
+                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(23,23, true));
+                    _inky.move(_inkyDirection);
 
                 } else if (_mode == Mode.FRIGHTENED){
+                    _blinkyDirection = _blinky.randomDirection(_blinkyCoordinate, _blinkyDirection);
+                    _blinky.move(_blinkyDirection);
 
-                    if(!_blinky.isCollided()){
-                        _blinkyDirection = _blinky.randomDirection(_blinkyCoordinate, _blinkyDirection);
-                        _blinky.move(_blinkyDirection);
-                    }
+                    _pinkyDirection = _pinky.randomDirection(_pinkyCoordinate, _pinkyDirection);
+                    _pinky.move(_pinkyDirection);
 
-                    if(!_pinky.isCollided()){
-                        _pinkyDirection = _pinky.randomDirection(_pinkyCoordinate, _pinkyDirection);
-                        _pinky.move(_pinkyDirection);
-                    }
+                    _clydeDirection = _clyde.randomDirection(_clydeCoordinate, _clydeDirection);
+                    _clyde.move(_clydeDirection);
 
-                    if(!_clyde.isCollided()){
-                        _clydeDirection = _clyde.randomDirection(_clydeCoordinate, _clydeDirection);
-                        _clyde.move(_clydeDirection);
-                    }
-
-                    if(!_inky.isCollided()){
-                        _inkyDirection = _inky.randomDirection(_inkyCoordinate, _inkyDirection);
-                        _inky.move(_inkyDirection);
-                    }
+                    _inkyDirection = _inky.randomDirection(_inkyCoordinate, _inkyDirection);
+                    _inky.move(_inkyDirection);
                 }
 
-            this.checkForCollision();
-            _sidebar.updateScoreLabel(_score);
+                this.checkForCollision();
+                _sidebar.updateScoreLabel(_score);
+                _sidebar.updateLivesLabel(_lives);
+            }
+        }
+
+        public void setMode(){
+            if(!_frightenedMode){
+                _modeCounter++;
+
+                if(_modeCounter==20/Constants.DURATION){
+                    _mode = _mode.opposite();
+                }
+
+                if(_modeCounter==27/Constants.DURATION){
+                    _mode = _mode.opposite();
+                    _modeCounter = 0;
+                }
+            } else {
+                _frightenedCounter++;
+                _mode = Mode.FRIGHTENED;
+
+                _blinky.changeColor(Color.CYAN);
+                _clyde.changeColor(Color.CYAN);
+                _pinky.changeColor(Color.CYAN);
+                _inky.changeColor(Color.CYAN);
+
+                if(_frightenedCounter == 32){
+                    _frightenedCounter = 0;
+                    _modeCounter = 0;
+
+                    _blinky.changeBackColor();
+                    _clyde.changeBackColor();
+                    _pinky.changeBackColor();
+                    _inky.changeBackColor();
+
+                    _mode = Mode.CHASE;
+                    _frightenedMode = false;
+                }
+            }
         }
 
         public void checkForCollision() {
@@ -334,10 +304,28 @@ public class Game {
             MazeSquare currentSquare = _map[pacmanRow][pacmanColumn];
 
             for (int i = 0; i < currentSquare.getSquareElements().size(); i++) {
-                if (currentSquare.containsDot(i) || currentSquare.containsEnergizer(i) || currentSquare.containsGhost(i)) {
+                if (currentSquare.containsDot(i)) {
+                    currentSquare.getCollidable(i).collide();
+
+                } else if(currentSquare.containsEnergizer(i)){
+                    currentSquare.getCollidable(i).collide();
+                    _frightenedMode = true;
+
+                } else if(currentSquare.containsGhost(i)) {
+                    if (_frightenedMode) {
                         currentSquare.getCollidable(i).collide();
-                        this.incrementScore(currentSquare,i);
+                    } else {
+                        if(_lives > 1){
+                            _lives--;
+                            this.resetGame();
+                        } else {
+                            _lives--;
+                            _outOfLives = true;
+                        }
+                    }
                 }
+
+                this.incrementScore(currentSquare,i);
              }
                 currentSquare.getSquareElements().clear();
         }
@@ -347,35 +335,67 @@ public class Game {
                 _score = _score+10;
             }
             if(currentSquare.containsEnergizer(i)){
-
-                _frightenedMode = true;
                 _score = _score+100;
             }
             if(currentSquare.containsGhost(i)){
-
                 if(_frightenedMode){
                     _score = _score+200;
-
-                } else {
-
-                    //resetGame();
                 }
             }
         }
 
         public void resetGame(){
-
             _pacman.setLocation(17,11);
             _blinky.setLocation(8,11);
             _pinky.setLocation(10,10);
-            _clyde.setLocation(10,10);
-            _inky.setLocation(10,10);
+            _inky.setLocation(10,11);
+            _clyde.setLocation(10,12);
+            _pacmanDirection = Direction.INITIAL;
+            _blinkyDirection = Direction.RIGHT;
+            _pinkyDirection = Direction.RIGHT;
+            _clydeDirection = Direction.RIGHT;
+            _inkyDirection = Direction.RIGHT;
+            _pen = new GhostPen(_blinky, _pinky, _clyde, _inky, Game.this);
         }
 
+        private void setUpGameIsOverLabel(){
+            Label label = new Label();
+            label.setText("Game Over!");
+            label.setLayoutX(235);
+            label.setLayoutY(300);
+            label.setTextFill(Color.rgb(255, 255, 0));
+            label.setFont(new Font("Arial", tetris.Constants.LABEL_2_FONT_SIZE));
+            _boardPane.getChildren().add(label);
+        }
+    }
 
+    public boolean ifNoMoreDots() {
+        for (int row = 0; row < Constants.MAZE_DIMENSION; row++) {
+            for (int col = 0; col < Constants.MAZE_DIMENSION; col++) {
 
+                for(int i = 0; i < _map[row][col].getSquareElements().size(); i++){
+                    if(_map[row][col].containsDot(i) || _map[row][col].containsEnergizer(i)){
+                        return false;
+                    }
+                }
+
+            }
+        }
+        return true;
+    }
+
+    public boolean gameIsOver(){
+
+        if(ifNoMoreDots() || _outOfLives){
+
+            return true;
+        } else {
+            return false;
+        }
     }
 }
+
+
 
 
 

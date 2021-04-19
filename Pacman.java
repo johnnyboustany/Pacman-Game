@@ -44,7 +44,6 @@ public class Pacman {
         }
 
     public boolean moveIsValid(int rowOffset, int colOffset){
-
         int yLocation = (this.getRowLocation() + rowOffset)*Constants.SQUARE_WIDTH+(Constants.SQUARE_WIDTH/2);
         int xLocation = (this.getColLocation() + colOffset)*Constants.SQUARE_WIDTH+(Constants.SQUARE_WIDTH/2);
 

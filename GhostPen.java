@@ -6,19 +6,22 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
-
 import java.util.LinkedList;
 
 public class GhostPen {
-
-    int _penCounter;
+    private int _penCounter;
     private Ghost _blinky;
     private Ghost _pinky;
     private Ghost _clyde;
     private Ghost _inky;
     private LinkedList _ghostPen;
+    private Timeline _timeline;
+    private boolean _gameIsOver;
+    private Game _game;
 
-    public GhostPen(Ghost blinky, Ghost pinky, Ghost clyde, Ghost inky){
+    public GhostPen(Ghost blinky, Ghost pinky, Ghost clyde, Ghost inky, Game game){
+        _game = game;
+        _gameIsOver = false;
         _blinky = blinky;
         _pinky = pinky;
         _clyde = clyde;
@@ -37,45 +40,57 @@ public class GhostPen {
 
     private void setUpTimeline() {
         KeyFrame kf = new KeyFrame(Duration.seconds(Constants.DURATION), new TimeHandler());
-        Timeline timeline = new Timeline(kf);
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+        _timeline = new Timeline(kf);
+        _timeline.setCycleCount(Animation.INDEFINITE);
+        _timeline.play();
     }
+
 
     private class TimeHandler implements EventHandler<ActionEvent> {
 
         public void handle(ActionEvent event) {
-           if(!_ghostPen.isEmpty()){
-               _penCounter++;
-           }
 
-           if(_penCounter==16){
-               _penCounter = 0;
-                Ghost currentGhost = (Ghost) _ghostPen.removeFirst();
-                currentGhost.setLocation(8,11);
+            if(_game.gameIsOver()){
+                _timeline.stop();
             }
+                if(!_ghostPen.isEmpty()){
+                    _penCounter++;
+                }
 
-          // if(_ghostPen.contains(_pinky)){
-          //     _pinkyCoordinate = new BoardCoordinate(_pinky.getRowLocation(), _pinky.getColLocation(), false);
-          //     _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(17,10, true));
-          //     _pinky.move(_pinkyDirection);
-          // }
+                if(_blinky.isCollided()){
+                    _ghostPen.addLast(_blinky);
+                    _blinky.setLocation(10,10);
+                    _blinky.noLongerCollided();
+                }
 
-           // _clydeCoordinate = new BoardCoordinate(_clyde.getRowLocation(), _clyde.getColLocation(), false);
-          //  _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(9,3, true));
-          //  _clyde.move(_clydeDirection);
+                if(_clyde.isCollided()){
+                    _ghostPen.addLast(_clyde);
+                    _clyde.setLocation(10,10);
+                    _clyde.noLongerCollided();
+                }
 
-          //  _inkyCoordinate = new BoardCoordinate(_inky.getRowLocation(), _inky.getColLocation(), false);
-          //  _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(5,4, true));
-          //  _inky.move(_inkyDirection);
+                if(_pinky.isCollided()){
+                    _ghostPen.addLast(_pinky);
+                    _pinky.setLocation(10,10);
+                    _pinky.noLongerCollided();
+                }
+
+                if(_inky.isCollided()){
+                    _ghostPen.addLast(_inky);
+                    _inky.setLocation(10,10);
+                    _inky.noLongerCollided();
+                }
+
+                if(!_gameIsOver){
+                    if(_penCounter==16){
+                        _penCounter = 0;
+                        Ghost currentGhost = (Ghost) _ghostPen.removeFirst();
+                        currentGhost.setLocation(8,10);
+                    }
+                }
 
         }
-
     }
-
-
-
-
 }
 
 

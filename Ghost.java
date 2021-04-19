@@ -3,7 +3,6 @@ package pacman;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -15,8 +14,8 @@ public class Ghost implements Collidable {
     private MazeSquare[][] _map;
     private boolean _collided;
 
-
     public Ghost(String ghostName, Pane boardPane, MazeSquare[][] map) {
+
         _collided = false;
         _boardPane = boardPane;
         _map = map;
@@ -40,7 +39,6 @@ public class Ghost implements Collidable {
 
     }
 
-
     public void changeColor(Color color){
         _ghost.setFill(color);
     }
@@ -49,15 +47,11 @@ public class Ghost implements Collidable {
         _ghost.setFill(_color);
     }
 
-
-
     public void setLocation(int row, int col) {
 
         _ghost.setY(row * Constants.SQUARE_WIDTH);
         _ghost.setX(col * Constants.SQUARE_WIDTH);
     }
-
-
 
     public boolean isCollided() {
         return _collided;
@@ -65,8 +59,11 @@ public class Ghost implements Collidable {
 
     @Override
     public void collide() {
-        this.removeFromPane(_boardPane);
         _collided = true;
+    }
+
+    public void noLongerCollided(){
+        _collided = false;
     }
 
     @Override
@@ -96,14 +93,14 @@ public class Ghost implements Collidable {
     }
 
     public void move(Direction direction) {
+        _map[this.getRowLocation()][this.getColLocation()].getSquareElements().remove(this);
+
         int rowOffset = direction.getRowOffset();
         int colOffset = direction.getColOffset();
 
         if(this.getColLocation() + colOffset >= 0 && this.getColLocation() + colOffset <= 22) {
             if (moveIsValid(rowOffset, colOffset)) {
-                _map[this.getRowLocation()][this.getColLocation()].getSquareElements().remove(this);
                 _map[this.getRowLocation() + rowOffset][this.getColLocation() + colOffset].getSquareElements().add(this);
-
                 this.setLocation(this.getRowLocation() + rowOffset, this.getColLocation() + colOffset);
             }
 
@@ -129,8 +126,6 @@ public class Ghost implements Collidable {
         }
         return true;
     }
-
-
 
     public Direction randomDirection(BoardCoordinate ghostCoordinate, Direction currentDirection){
         ArrayList<Direction> _validDirections = new ArrayList<>();
@@ -171,12 +166,8 @@ public class Ghost implements Collidable {
         randomDirection = _validDirections.get(randInt);
         _validDirections.clear();
 
-
-
         return randomDirection;
     }
-
-
 
     public Direction ghostBFS(BoardCoordinate ghostCoordinate, Direction ghostDirection, BoardCoordinate targetCoordinate){
         LinkedList<BoardCoordinate> Q = new LinkedList<>();
