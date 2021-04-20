@@ -25,7 +25,7 @@ public class MazeSquare {
     }
 
     public boolean containsDot(int i) {
-        if (_squareElements.get(i).getType() == "dot") {
+        if (_squareElements.get(i).getType()=="dot") {
             return true;
         } else {
             return false;
@@ -33,23 +33,11 @@ public class MazeSquare {
     }
 
     public boolean containsEnergizer(int i) {
-        if (_squareElements.get(i).getType() == "energizer") {
+        if (_squareElements.get(i).getType()=="energizer") {
             return true;
         } else {
             return false;
         }
-    }
-
-    public boolean containsGhost(int i) {
-        if (_squareElements.get(i).getType().equals("ghost")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public Collidable getCollidable(int i) {
-        return _squareElements.get(i);
     }
 
     public ArrayList getSquareElements() {
@@ -76,6 +64,4 @@ public class MazeSquare {
     public void addToPane(Pane root) {
         root.getChildren().add(_rect);
     }
-
-
 }

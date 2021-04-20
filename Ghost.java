@@ -10,12 +10,13 @@ public class Ghost implements Collidable {
     private Rectangle _ghost;
     private Color _color;
     private MazeSquare[][] _map;
-    private boolean _collided;
     private Game _game;
+    private String _ghostName;
 
     public Ghost(String ghostName, MazeSquare[][] map, Game game) {
         _map = map;
         _game = game;
+        _ghostName = ghostName;
 
         switch (ghostName) {
             case "pinky":
@@ -32,14 +33,13 @@ public class Ghost implements Collidable {
                 break;
         }
         _ghost = new Rectangle(Constants.SQUARE_WIDTH, Constants.SQUARE_WIDTH, _color);
-        _collided = false;
     }
 
     @Override
     public void collide() {
         if(_game.isInFrightenedMode()){
             _game.addToScore(200);
-            _collided = true;
+            _game.getPen().addToPen(this);
         } else {
             _game.killPacman();
         }
@@ -47,15 +47,7 @@ public class Ghost implements Collidable {
 
     @Override
     public String getType() {
-        return "ghost";
-    }
-
-    public boolean isCollided() {
-        return _collided;
-    }
-
-    public void setCollidedFalse(){
-        _collided = false;
+        return _ghostName;
     }
 
     public void move(Direction direction) {

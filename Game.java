@@ -42,19 +42,26 @@ public class Game {
     private  int _lives;
     private boolean _outOfLives;
 
-
     public Game(Pane boardPane, Sidebar sidebar) {
         _boardPane = boardPane;
         _sidebar = sidebar;
         this.setUpBoard();
 
-        _pen = new GhostPen(_blinky, _pinky, _clyde, _inky,this);
-
+        //initializing
         _pacmanDirection = Direction.INITIAL;
         _blinkyDirection = Direction.RIGHT;
         _pinkyDirection = Direction.RIGHT;
         _clydeDirection = Direction.RIGHT;
         _inkyDirection = Direction.RIGHT;
+        _pacmanCoordinate = new BoardCoordinate(_pacman.getRowLocation(), _pacman.getColLocation(), false);
+        _blinkyCoordinate = new BoardCoordinate(_blinky.getRowLocation(), _blinky.getColLocation(), false);
+        _pinkyCoordinate = new BoardCoordinate(_pinky.getRowLocation(), _pinky.getColLocation(), false);
+        _clydeCoordinate = new BoardCoordinate(_clyde.getRowLocation(), _clyde.getColLocation(), false);
+        _inkyCoordinate = new BoardCoordinate(_inky.getRowLocation(), _inky.getColLocation(), false);
+
+
+        _pen = new GhostPen(_blinky, _pinky, _clyde, _inky,this, _map);
+
 
         _mode = Mode.CHASE;
         _outOfLives = false;
@@ -95,6 +102,7 @@ public class Game {
                         _map[row][col].getSquareElements().add(energizer);
                         break;
                 }
+
             }
         }
 
@@ -195,10 +203,10 @@ public class Game {
          */
         public void handle(ActionEvent event) {
             if(gameIsOver()){
-                resetGame();
-                this.setUpGameIsOverLabel();
-                _timeline.stop();
 
+                resetGame();
+                setUpGameIsOverLabel();
+                _timeline.stop();
             } else {
                 this.setMode();
 
@@ -211,10 +219,6 @@ public class Game {
                 _pacman.move(_pacmanDirection);
                 this.checkForCollision();
 
-                // _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
-                // _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
-                //_map[_clyde.getRowLocation()][_clyde.getColLocation()].getSquareElements().remove(_clyde);
-                //_map[_inky.getRowLocation()][_inky.getColLocation()].getSquareElements().remove(_inky);
 
                 this.moveGhosts();
                 this.checkForCollision();
@@ -254,7 +258,7 @@ public class Game {
                     _pinky.changeBackColor();
                     _inky.changeBackColor();
 
-                    _mode = Mode.CHASE;
+                    _mode = _mode.CHASE;
                     _frightenedMode = false;
                 }
             }
@@ -337,7 +341,6 @@ public class Game {
                         return false;
                     }
                 }
-
             }
         }
         return true;
@@ -346,7 +349,6 @@ public class Game {
     public boolean gameIsOver(){
 
         if(ifNoMoreDots() || _outOfLives){
-
             return true;
         } else {
             return false;
@@ -371,11 +373,17 @@ public class Game {
             this.resetGame();
         } else {
             _lives--;
+            resetGame();
             _outOfLives = true;
         }
     }
 
     public void resetGame(){
+        _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
+        _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
+        _map[_clyde.getRowLocation()][_clyde.getColLocation()].getSquareElements().remove(_clyde);
+        _map[_inky.getRowLocation()][_inky.getColLocation()].getSquareElements().remove(_inky);
+
         _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
         _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
         _pinky.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
@@ -387,8 +395,14 @@ public class Game {
         _pinkyDirection = Direction.RIGHT;
         _clydeDirection = Direction.RIGHT;
         _inkyDirection = Direction.RIGHT;
-        _pen = new GhostPen(_blinky, _pinky, _clyde, _inky, Game.this);
+        _pen = new GhostPen(_blinky, _pinky, _clyde, _inky, this, _map);
     }
+
+    public GhostPen getPen(){
+        return _pen;
+    }
+
+
 }
 
 

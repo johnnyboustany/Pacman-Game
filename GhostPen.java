@@ -18,8 +18,10 @@ public class GhostPen {
     private Timeline _timeline;
     private boolean _gameIsOver;
     private Game _game;
+    private MazeSquare[][] _map;
 
-    public GhostPen(Ghost blinky, Ghost pinky, Ghost clyde, Ghost inky, Game game){
+    public GhostPen(Ghost blinky, Ghost pinky, Ghost clyde, Ghost inky, Game game, MazeSquare[][] map){
+        _map = map;
         _game = game;
         _gameIsOver = false;
         _blinky = blinky;
@@ -45,45 +47,47 @@ public class GhostPen {
     }
 
     private class TimeHandler implements EventHandler<ActionEvent> {
-
         public void handle(ActionEvent event) {
             if(_game.gameIsOver()){
                 _timeline.stop();
             } else {
                 if(!_ghostPen.isEmpty()){
                     _penCounter++;
-                }
 
-                if(_blinky.isCollided()){
-                    _ghostPen.addLast(_blinky);
-                    _blinky.setLocation(Constants.BLINKY_STARTING_ROW+2,Constants.BLINKY_STARTING_COL);
-                    _blinky.setCollidedFalse();
-                }
+                    if(_penCounter==4/Constants.DURATION){
+                        _penCounter = 0;
+                        Ghost currentGhost = (Ghost) _ghostPen.removeFirst();
 
-                if(_clyde.isCollided()){
-                    _ghostPen.addLast(_clyde);
-                    _clyde.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
-                    _clyde.setCollidedFalse();
-                }
+                        _map[currentGhost.getRowLocation()][currentGhost.getColLocation()].getSquareElements().remove(currentGhost);
+                        currentGhost.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
+                        _map[currentGhost.getRowLocation()][currentGhost.getColLocation()].getSquareElements().remove(currentGhost);
+                    }
 
-                if(_pinky.isCollided()){
-                    _ghostPen.addLast(_pinky);
-                    _pinky.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
-                    _pinky.setCollidedFalse();
-                }
-
-                if(_inky.isCollided()){
-                    _ghostPen.addLast(_inky);
-                    _inky.setLocation(Constants.INKY_STARTING_ROW,Constants.INKY_STARTING_COL);
-                    _inky.setCollidedFalse();
-                }
-
-                if(_penCounter==16){
+                } else {
                     _penCounter = 0;
-                    Ghost currentGhost = (Ghost) _ghostPen.removeFirst();
-                    currentGhost.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
                 }
             }
+        }
+    }
+
+    public void addToPen(Ghost ghost){
+        _ghostPen.addLast(ghost);
+
+        _map[ghost.getRowLocation()][ghost.getColLocation()].getSquareElements().remove(ghost);
+
+        switch (ghost.getType()) {
+            case "blinky":
+                ghost.setLocation(Constants.BLINKY_STARTING_ROW+2,Constants.BLINKY_STARTING_COL);
+                break;
+            case "inky":
+                ghost.setLocation(Constants.INKY_STARTING_ROW,Constants.INKY_STARTING_COL);
+                break;
+            case "pinky":
+                ghost.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
+                break;
+            case "clyde":
+                ghost.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
+                break;
         }
     }
 }

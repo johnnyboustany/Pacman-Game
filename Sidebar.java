@@ -45,6 +45,9 @@ public class Sidebar {
      *
      */
     public void updateLivesLabel(int lives){
+        if(lives < 0){
+        lives = 0;
+        }
         _label1.setText("Lives:" + lives);
     }
 
@@ -54,6 +57,6 @@ public class Sidebar {
      *
      */
     public void updateScoreLabel(int score){
-         _label2.setText("Score:" + score);
+        _label2.setText("Score:" + score);
     }
 }
