@@ -41,11 +41,9 @@ public class Game {
     public GhostPen _pen;
     private  int _lives;
     private boolean _outOfLives;
-    private boolean _pacmanDead;
 
 
     public Game(Pane boardPane, Sidebar sidebar) {
-        _pacmanDead = false;
         _boardPane = boardPane;
         _sidebar = sidebar;
         this.setUpBoard();
@@ -219,13 +217,6 @@ public class Game {
                 _pacman.move(_pacmanDirection);
                 this.checkForCollision();
 
-                boolean _alreadyKilled = false;
-
-                if(_pacmanDead){
-                    this.killPacman();
-                    _alreadyKilled = true;
-                }
-
                // _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
                // _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
                 //_map[_clyde.getRowLocation()][_clyde.getColLocation()].getSquareElements().remove(_clyde);
@@ -272,10 +263,6 @@ public class Game {
                 }
 
                 this.checkForCollision();
-
-                if(!_alreadyKilled && _pacmanDead){
-                    this.killPacman();
-                }
 
                 _sidebar.updateScoreLabel(_score);
                 _sidebar.updateLivesLabel(_lives);
@@ -328,7 +315,7 @@ public class Game {
                 currentSquare.getCollidable(i).collide();
                 this.updateGame(currentSquare,i);
             }
-                currentSquare.getSquareElements().clear();
+            currentSquare.getSquareElements().clear();
         }
 
         public void updateGame(MazeSquare currentSquare, int i ){
@@ -340,25 +327,24 @@ public class Game {
                 _frightenedMode = true;
             }
             if(currentSquare.containsGhost(i)){
+                currentSquare.getSquareElements().remove(i);
+
                 if(_frightenedMode){
                     _score = _score+200;
                 } else {
-                    _pacmanDead = true;
+
+                    if(_lives > 1){
+                        _lives--;
+
+                        this.resetGame();
+                    } else {
+                        _lives--;
+                        _outOfLives = true;
+                    }
                 }
             }
         }
 
-        public void killPacman(){
-            if(_lives > 1){
-                _lives--;
-                _pacmanDead = false;
-                this.resetGame();
-            } else {
-                _lives--;
-                _outOfLives = true;
-            }
-
-        }
         public void resetGame(){
 
             _pacman.setLocation(17,11);
