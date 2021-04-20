@@ -5,14 +5,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
-  * This is the  main class where your Pacman game will start.
-  * The main method of this application calls the start method. You
-  * will need to fill in the start method to instantiate your game.
-  *
-  * Class comments here...
-  *
-  */
-
+ * The App class instantiates the PaneOrganizer, which in turn allows the children nodes
+ * to be instantiated. It passes in the root pane from the instance of the PaneOrganizer into
+ * the constructor of the scene. This allows the stage to set the scene, which will be used to
+ * display the Pacman game.
+ *
+ */
 public class App extends Application {
 
     @Override

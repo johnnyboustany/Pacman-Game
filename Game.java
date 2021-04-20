@@ -195,17 +195,11 @@ public class Game {
          */
         public void handle(ActionEvent event) {
             if(gameIsOver()){
-                _pacman.setLocation(17,11);
-                _blinky.setLocation(8,11);
-                _pinky.setLocation(10,10);
-                _inky.setLocation(10,11);
-                _clyde.setLocation(10,12);
-
+                this.resetGame();
                 this.setUpGameIsOverLabel();
                 _timeline.stop();
 
             } else {
-
                 this.setMode();
 
                 _pacmanCoordinate = new BoardCoordinate(_pacman.getRowLocation(), _pacman.getColLocation(), false);
@@ -217,51 +211,12 @@ public class Game {
                 _pacman.move(_pacmanDirection);
                 this.checkForCollision();
 
-               // _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
-               // _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
+                // _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
+                // _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
                 //_map[_clyde.getRowLocation()][_clyde.getColLocation()].getSquareElements().remove(_clyde);
                 //_map[_inky.getRowLocation()][_inky.getColLocation()].getSquareElements().remove(_inky);
 
-                if(_mode==Mode.CHASE){
-                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection,_pacmanCoordinate);
-                    _blinky.move(_blinkyDirection);
-
-                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(_pacman.getRowLocation()+1,_pacman.getColLocation()-3, true));
-                    _pinky.move(_pinkyDirection);
-
-                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(_pacman.getRowLocation()-4,_pacman.getColLocation(), true));
-                    _clyde.move(_clydeDirection);
-
-                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(_pacman.getRowLocation(),_pacman.getColLocation()+2,true));
-                    _inky.move(_inkyDirection);
-
-                } else if (_mode==Mode.SCATTER){
-                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, new BoardCoordinate(0,0, true));
-                    _blinky.move(_blinkyDirection);
-
-                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(0,23, true));
-                    _pinky.move(_pinkyDirection);
-
-                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(23,0, true));
-                    _clyde.move(_clydeDirection);
-
-                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(23,23, true));
-                    _inky.move(_inkyDirection);
-
-                } else if (_mode == Mode.FRIGHTENED){
-                    _blinkyDirection = _blinky.randomDirection(_blinkyCoordinate, _blinkyDirection);
-                    _blinky.move(_blinkyDirection);
-
-                    _pinkyDirection = _pinky.randomDirection(_pinkyCoordinate, _pinkyDirection);
-                    _pinky.move(_pinkyDirection);
-
-                    _clydeDirection = _clyde.randomDirection(_clydeCoordinate, _clydeDirection);
-                    _clyde.move(_clydeDirection);
-
-                    _inkyDirection = _inky.randomDirection(_inkyCoordinate, _inkyDirection);
-                    _inky.move(_inkyDirection);
-                }
-
+                this.moveGhosts();
                 this.checkForCollision();
 
                 _sidebar.updateScoreLabel(_score);
@@ -277,7 +232,7 @@ public class Game {
                     _mode = _mode.opposite();
                 }
 
-                if(_modeCounter==27/Constants.DURATION){
+                if(_modeCounter==(20+7)/Constants.DURATION){
                     _mode = _mode.opposite();
                     _modeCounter = 0;
                 }
@@ -290,7 +245,7 @@ public class Game {
                 _pinky.changeColor(Color.CYAN);
                 _inky.changeColor(Color.CYAN);
 
-                if(_frightenedCounter == 32){
+                if(_frightenedCounter == 8/Constants.DURATION){
                     _frightenedCounter = 0;
                     _modeCounter = 0;
 
@@ -302,6 +257,51 @@ public class Game {
                     _mode = Mode.CHASE;
                     _frightenedMode = false;
                 }
+            }
+        }
+        public void moveGhosts(){
+
+            switch(_mode){
+
+                case CHASE:
+                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection,_pacmanCoordinate);
+                    _blinky.move(_blinkyDirection);
+
+                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(_pacman.getRowLocation()+1,_pacman.getColLocation()-3, true));
+                    _pinky.move(_pinkyDirection);
+
+                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(_pacman.getRowLocation()-4,_pacman.getColLocation(), true));
+                    _clyde.move(_clydeDirection);
+
+                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(_pacman.getRowLocation(),_pacman.getColLocation()+2,true));
+                    _inky.move(_inkyDirection);
+                    break;
+                case SCATTER:
+                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, new BoardCoordinate(0,0, true));
+                    _blinky.move(_blinkyDirection);
+
+                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(0,Constants.MAZE_DIMENSION, true));
+                    _pinky.move(_pinkyDirection);
+
+                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(Constants.MAZE_DIMENSION,0, true));
+                    _clyde.move(_clydeDirection);
+
+                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(Constants.MAZE_DIMENSION,Constants.MAZE_DIMENSION, true));
+                    _inky.move(_inkyDirection);
+                    break;
+                case FRIGHTENED:
+                    _blinkyDirection = _blinky.randomDirection(_blinkyCoordinate, _blinkyDirection);
+                    _blinky.move(_blinkyDirection);
+
+                    _pinkyDirection = _pinky.randomDirection(_pinkyCoordinate, _pinkyDirection);
+                    _pinky.move(_pinkyDirection);
+
+                    _clydeDirection = _clyde.randomDirection(_clydeCoordinate, _clydeDirection);
+                    _clyde.move(_clydeDirection);
+
+                    _inkyDirection = _inky.randomDirection(_inkyCoordinate, _inkyDirection);
+                    _inky.move(_inkyDirection);
+                    break;
             }
         }
 
@@ -332,10 +332,8 @@ public class Game {
                 if(_frightenedMode){
                     _score = _score+200;
                 } else {
-
                     if(_lives > 1){
                         _lives--;
-
                         this.resetGame();
                     } else {
                         _lives--;
@@ -347,11 +345,12 @@ public class Game {
 
         public void resetGame(){
 
-            _pacman.setLocation(17,11);
-            _blinky.setLocation(8,11);
-            _pinky.setLocation(10,10);
-            _inky.setLocation(10,11);
-            _clyde.setLocation(10,12);
+            _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
+            _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
+            _pinky.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
+            _inky.setLocation(Constants.INKY_STARTING_ROW,Constants.INKY_STARTING_COL);
+            _clyde.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
+
             _pacmanDirection = Direction.INITIAL;
             _blinkyDirection = Direction.RIGHT;
             _pinkyDirection = Direction.RIGHT;
