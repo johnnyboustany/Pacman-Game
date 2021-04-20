@@ -41,8 +41,11 @@ public class Game {
     public GhostPen _pen;
     private  int _lives;
     private boolean _outOfLives;
+    private boolean _pacmanDead;
+
 
     public Game(Pane boardPane, Sidebar sidebar) {
+        _pacmanDead = false;
         _boardPane = boardPane;
         _sidebar = sidebar;
         this.setUpBoard();
@@ -106,22 +109,22 @@ public class Game {
                         _map[row][col].addToPane(_boardPane);
                         break;
                     case GHOST_START_LOCATION:
-                        _inky = new Ghost("inky", _boardPane, _map);
+                        _inky = new Ghost("inky", _boardPane, _map, this);
                         _inky.setLocation(row, col);
                         _inky.addToPane(_boardPane);
                         _map[row][col].getSquareElements().add(_inky);
 
-                        _clyde = new Ghost("clyde", _boardPane, _map);
+                        _clyde = new Ghost("clyde", _boardPane, _map, this);
                         _clyde.setLocation(row, col + 1);
                         _clyde.addToPane(_boardPane);
                         _map[row][col+1].getSquareElements().add(_clyde);
 
-                        _pinky = new Ghost("pinky", _boardPane, _map);
+                        _pinky = new Ghost("pinky", _boardPane, _map, this);
                         _pinky.setLocation(row, col - 1);
                         _pinky.addToPane(_boardPane);
                         _map[row][col-1].getSquareElements().add(_pinky);
 
-                        _blinky = new Ghost("blinky", _boardPane, _map);
+                        _blinky = new Ghost("blinky", _boardPane, _map, this);
                         _blinky.setLocation(row -2, col);
                         _blinky.addToPane(_boardPane);
                         _map[row-2][col].getSquareElements().add(_blinky);
@@ -204,6 +207,7 @@ public class Game {
                 _timeline.stop();
 
             } else {
+
                 this.setMode();
 
                 _pacmanCoordinate = new BoardCoordinate(_pacman.getRowLocation(), _pacman.getColLocation(), false);
@@ -214,6 +218,18 @@ public class Game {
 
                 _pacman.move(_pacmanDirection);
                 this.checkForCollision();
+
+                boolean _alreadyKilled = false;
+
+                if(_pacmanDead){
+                    this.killPacman();
+                    _alreadyKilled = true;
+                }
+
+               // _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
+               // _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
+                //_map[_clyde.getRowLocation()][_clyde.getColLocation()].getSquareElements().remove(_clyde);
+                //_map[_inky.getRowLocation()][_inky.getColLocation()].getSquareElements().remove(_inky);
 
                 if(_mode==Mode.CHASE){
                     _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection,_pacmanCoordinate);
@@ -256,6 +272,11 @@ public class Game {
                 }
 
                 this.checkForCollision();
+
+                if(!_alreadyKilled && _pacmanDead){
+                    this.killPacman();
+                }
+
                 _sidebar.updateScoreLabel(_score);
                 _sidebar.updateLivesLabel(_lives);
             }
@@ -304,47 +325,42 @@ public class Game {
             MazeSquare currentSquare = _map[pacmanRow][pacmanColumn];
 
             for (int i = 0; i < currentSquare.getSquareElements().size(); i++) {
-                if (currentSquare.containsDot(i)) {
-                    currentSquare.getCollidable(i).collide();
-
-                } else if(currentSquare.containsEnergizer(i)){
-                    currentSquare.getCollidable(i).collide();
-                    _frightenedMode = true;
-
-                } else if(currentSquare.containsGhost(i)) {
-                    if (_frightenedMode) {
-                        currentSquare.getCollidable(i).collide();
-                    } else {
-                        if(_lives > 1){
-                            _lives--;
-                            this.resetGame();
-                        } else {
-                            _lives--;
-                            _outOfLives = true;
-                        }
-                    }
-                }
-
-                this.incrementScore(currentSquare,i);
-             }
+                currentSquare.getCollidable(i).collide();
+                this.updateGame(currentSquare,i);
+            }
                 currentSquare.getSquareElements().clear();
         }
 
-        public void incrementScore(MazeSquare currentSquare, int i ){
+        public void updateGame(MazeSquare currentSquare, int i ){
             if(currentSquare.containsDot(i)){
                 _score = _score+10;
             }
             if(currentSquare.containsEnergizer(i)){
                 _score = _score+100;
+                _frightenedMode = true;
             }
             if(currentSquare.containsGhost(i)){
                 if(_frightenedMode){
                     _score = _score+200;
+                } else {
+                    _pacmanDead = true;
                 }
             }
         }
 
+        public void killPacman(){
+            if(_lives > 1){
+                _lives--;
+                _pacmanDead = false;
+                this.resetGame();
+            } else {
+                _lives--;
+                _outOfLives = true;
+            }
+
+        }
         public void resetGame(){
+
             _pacman.setLocation(17,11);
             _blinky.setLocation(8,11);
             _pinky.setLocation(10,10);
@@ -392,6 +408,10 @@ public class Game {
         } else {
             return false;
         }
+    }
+
+    public boolean isInFrightenedMode() {
+        return _frightenedMode;
     }
 }
 

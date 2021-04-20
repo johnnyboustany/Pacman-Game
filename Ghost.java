@@ -13,9 +13,11 @@ public class Ghost implements Collidable {
     private Pane _boardPane;
     private MazeSquare[][] _map;
     private boolean _collided;
+    private Game _game;
 
-    public Ghost(String ghostName, Pane boardPane, MazeSquare[][] map) {
+    public Ghost(String ghostName, Pane boardPane, MazeSquare[][] map, Game game) {
 
+        _game = game;
         _collided = false;
         _boardPane = boardPane;
         _map = map;
@@ -59,7 +61,9 @@ public class Ghost implements Collidable {
 
     @Override
     public void collide() {
-        _collided = true;
+        if(_game.isInFrightenedMode()){
+            _collided = true;
+        }
     }
 
     public void noLongerCollided(){
@@ -103,23 +107,21 @@ public class Ghost implements Collidable {
                 _map[this.getRowLocation() + rowOffset][this.getColLocation() + colOffset].getSquareElements().add(this);
                 this.setLocation(this.getRowLocation() + rowOffset, this.getColLocation() + colOffset);
             }
-
         } else {
-
             if(this.getColLocation() + colOffset < 0){
                 this.setLocation(11,22);
+                _map[11][22].getSquareElements().add(this);
 
             } else if(this.getColLocation() + colOffset > 22){
                 this.setLocation(11,0);
+                _map[11][0].getSquareElements().add(this);
             }
         }
     }
 
     public boolean moveIsValid(int rowOffset, int colOffset) {
-
         int yLocation = (this.getRowLocation() + rowOffset) * Constants.SQUARE_WIDTH;
         int xLocation = (this.getColLocation() + colOffset) * Constants.SQUARE_WIDTH;
-
 
         if (_map[yLocation / Constants.SQUARE_WIDTH][xLocation / Constants.SQUARE_WIDTH].isWall()) {
             return false;
@@ -144,17 +146,14 @@ public class Ghost implements Collidable {
 
         if(ghostColumn+1 < 22 && !(_map[ghostRow][ghostColumn+1].isWall()) && currentDirection.opposite() != Direction.RIGHT){
             _validDirections.add(Direction.RIGHT);
-
         }
 
         if(ghostColumn+1 >= 22 && !(_map[ghostRow][0].isWall()) && currentDirection.opposite() != Direction.RIGHT){
             _validDirections.add(Direction.RIGHT);
-
         }
 
         if(ghostColumn-1 > 0 && !_map[ghostRow][ghostColumn-1].isWall() && currentDirection.opposite() != Direction.LEFT){
             _validDirections.add(Direction.LEFT);
-
         }
 
         if(ghostColumn-1 <= 0 && !_map[ghostRow][22].isWall() && currentDirection.opposite() != Direction.LEFT){
