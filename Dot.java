@@ -7,9 +7,12 @@ import javafx.scene.shape.Circle;
 public class Dot implements Collidable{
     private Circle _dot;
     private Pane _boardPane;
+    private Game _game;
 
-    public Dot(Pane boardPane){
+    public Dot(Pane boardPane, Game game){
         _boardPane = boardPane;
+        _game = game;
+
         _dot = new Circle();
         _dot.setRadius(4);
         _dot.setFill(Color.WHITE);
@@ -17,6 +20,7 @@ public class Dot implements Collidable{
 
     @Override
     public void collide() {
+        _game.addToScore(10);
         this.removeFromPane(_boardPane);
     }
 

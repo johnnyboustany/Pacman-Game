@@ -83,13 +83,13 @@ public class Game {
 
                 switch (supportMap[row][col]) {
                     case DOT:
-                        Dot dot = new Dot(_boardPane);
+                        Dot dot = new Dot(_boardPane, this);
                         dot.setLocation(row, col);
                         dot.addToPane(_boardPane);
                         _map[row][col].getSquareElements().add(dot);
                         break;
                     case ENERGIZER:
-                        Energizer energizer = new Energizer(_boardPane);
+                        Energizer energizer = new Energizer(_boardPane, this);
                         energizer.setLocation(row, col);
                         energizer.addToPane(_boardPane);
                         _map[row][col].getSquareElements().add(energizer);
@@ -195,7 +195,7 @@ public class Game {
          */
         public void handle(ActionEvent event) {
             if(gameIsOver()){
-                this.resetGame();
+                resetGame();
                 this.setUpGameIsOverLabel();
                 _timeline.stop();
 
@@ -260,7 +260,6 @@ public class Game {
             }
         }
         public void moveGhosts(){
-
             switch(_mode){
 
                 case CHASE:
@@ -311,51 +310,11 @@ public class Game {
 
             MazeSquare currentSquare = _map[pacmanRow][pacmanColumn];
 
-            for (int i = 0; i < currentSquare.getSquareElements().size(); i++) {
-                currentSquare.getCollidable(i).collide();
-                this.updateGame(currentSquare,i);
+            while(currentSquare.getSquareElements().size() != 0){
+                Collidable collidable;
+                collidable = (Collidable) currentSquare.getSquareElements().remove(currentSquare.getSquareElements().size()-1);
+                collidable.collide();
             }
-            currentSquare.getSquareElements().clear();
-        }
-
-        public void updateGame(MazeSquare currentSquare, int i ){
-            if(currentSquare.containsDot(i)){
-                _score = _score+10;
-            }
-            if(currentSquare.containsEnergizer(i)){
-                _score = _score+100;
-                _frightenedMode = true;
-            }
-            if(currentSquare.containsGhost(i)){
-                currentSquare.getSquareElements().remove(i);
-
-                if(_frightenedMode){
-                    _score = _score+200;
-                } else {
-                    if(_lives > 1){
-                        _lives--;
-                        this.resetGame();
-                    } else {
-                        _lives--;
-                        _outOfLives = true;
-                    }
-                }
-            }
-        }
-
-        public void resetGame(){
-            _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
-            _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
-            _pinky.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
-            _inky.setLocation(Constants.INKY_STARTING_ROW,Constants.INKY_STARTING_COL);
-            _clyde.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
-
-            _pacmanDirection = Direction.INITIAL;
-            _blinkyDirection = Direction.RIGHT;
-            _pinkyDirection = Direction.RIGHT;
-            _clydeDirection = Direction.RIGHT;
-            _inkyDirection = Direction.RIGHT;
-            _pen = new GhostPen(_blinky, _pinky, _clyde, _inky, Game.this);
         }
 
         private void setUpGameIsOverLabel(){
@@ -396,6 +355,39 @@ public class Game {
 
     public boolean isInFrightenedMode() {
         return _frightenedMode;
+    }
+
+    public void setFrightenedMode(){
+        _frightenedMode = true;
+    }
+
+    public void addToScore(int scoreIncrement){
+        _score = _score + scoreIncrement;
+    }
+
+    public void killPacman(){
+        if(_lives > 1){
+            _lives--;
+            this.resetGame();
+        } else {
+            _lives--;
+            _outOfLives = true;
+        }
+    }
+
+    public void resetGame(){
+        _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
+        _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
+        _pinky.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
+        _inky.setLocation(Constants.INKY_STARTING_ROW,Constants.INKY_STARTING_COL);
+        _clyde.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
+
+        _pacmanDirection = Direction.INITIAL;
+        _blinkyDirection = Direction.RIGHT;
+        _pinkyDirection = Direction.RIGHT;
+        _clydeDirection = Direction.RIGHT;
+        _inkyDirection = Direction.RIGHT;
+        _pen = new GhostPen(_blinky, _pinky, _clyde, _inky, Game.this);
     }
 }
 

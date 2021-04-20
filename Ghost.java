@@ -31,7 +31,6 @@ public class Ghost implements Collidable {
                 _color = Color.ORANGE;
                 break;
         }
-
         _ghost = new Rectangle(Constants.SQUARE_WIDTH, Constants.SQUARE_WIDTH, _color);
         _collided = false;
     }
@@ -39,7 +38,10 @@ public class Ghost implements Collidable {
     @Override
     public void collide() {
         if(_game.isInFrightenedMode()){
+            _game.addToScore(200);
             _collided = true;
+        } else {
+            _game.killPacman();
         }
     }
 

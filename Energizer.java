@@ -7,8 +7,10 @@ import javafx.scene.shape.Circle;
 public class Energizer implements Collidable{
     private Circle _energizer;
     private Pane _boardPane;
+    private Game _game;
 
-    public Energizer(Pane boardPane){
+    public Energizer(Pane boardPane, Game game){
+        _game = game;
         _boardPane = boardPane;
         _energizer = new Circle();
         _energizer.setRadius(8);
@@ -17,6 +19,8 @@ public class Energizer implements Collidable{
 
     @Override
     public void collide() {
+        _game.addToScore(100);
+        _game.setFrightenedMode();
         _boardPane.getChildren().remove(_energizer);
     }
 
