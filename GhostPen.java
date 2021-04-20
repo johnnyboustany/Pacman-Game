@@ -52,10 +52,6 @@ public class GhostPen {
                 _timeline.stop();
             } else {
 
-             //  if(_ghostPen.size()==4){
-             //       _penCounter = 0;
-              //  }
-
                 if(!_ghostPen.isEmpty()){
                     _penCounter++;
 
