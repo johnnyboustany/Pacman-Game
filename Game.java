@@ -59,15 +59,13 @@ public class Game {
         _clydeCoordinate = new BoardCoordinate(_clyde.getRowLocation(), _clyde.getColLocation(), false);
         _inkyCoordinate = new BoardCoordinate(_inky.getRowLocation(), _inky.getColLocation(), false);
 
-
         _pen = new GhostPen(_blinky, _pinky, _clyde, _inky,this, _map);
-
 
         _mode = Mode.CHASE;
         _outOfLives = false;
         _frightenedMode = false;
         _modeCounter = 0;
-        _lives = 3;
+        _lives = 10;
         _score = 0;
 
         this.setUpTimeline();
@@ -203,9 +201,11 @@ public class Game {
          */
         public void handle(ActionEvent event) {
             if(gameIsOver()){
+                endGame();
 
-                resetGame();
-                setUpGameIsOverLabel();
+                if(ifNoMoreDots()){
+                    setUpGameIsOverLabel();
+                }
                 _timeline.stop();
             } else {
                 this.setMode();
@@ -218,7 +218,6 @@ public class Game {
 
                 _pacman.move(_pacmanDirection);
                 this.checkForCollision();
-
 
                 this.moveGhosts();
                 this.checkForCollision();
@@ -320,16 +319,6 @@ public class Game {
                 collidable.collide();
             }
         }
-
-        private void setUpGameIsOverLabel(){
-            Label label = new Label();
-            label.setText("Game Over!");
-            label.setLayoutX(235);
-            label.setLayoutY(300);
-            label.setTextFill(Color.rgb(255, 255, 0));
-            label.setFont(new Font("Arial", Constants.GAME_IS_OVER_FONT_SIZE));
-            _boardPane.getChildren().add(label);
-        }
     }
 
     public boolean ifNoMoreDots() {
@@ -373,36 +362,63 @@ public class Game {
             this.resetGame();
         } else {
             _lives--;
-            resetGame();
+            endGame();
+            this.setUpGameIsOverLabel();
+
             _outOfLives = true;
         }
     }
 
     public void resetGame(){
+
         _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
         _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
         _map[_clyde.getRowLocation()][_clyde.getColLocation()].getSquareElements().remove(_clyde);
         _map[_inky.getRowLocation()][_inky.getColLocation()].getSquareElements().remove(_inky);
-
-        _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
-        _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
-        _pinky.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
-        _inky.setLocation(Constants.INKY_STARTING_ROW,Constants.INKY_STARTING_COL);
-        _clyde.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
 
         _pacmanDirection = Direction.INITIAL;
         _blinkyDirection = Direction.RIGHT;
         _pinkyDirection = Direction.RIGHT;
         _clydeDirection = Direction.RIGHT;
         _inkyDirection = Direction.RIGHT;
-        _pen = new GhostPen(_blinky, _pinky, _clyde, _inky, this, _map);
+
+        _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
+        _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
+
+        _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().add(_blinky);
+
+        _pen.setPenCounter(0);
+        _pen.addToPen(_pinky);
+        _pen.addToPen(_inky);
+        _pen.addToPen(_clyde);
+    }
+
+    public void endGame(){
+        _blinky.changeBackColor();
+        _clyde.changeBackColor();
+        _pinky.changeBackColor();
+        _inky.changeBackColor();
+
+        _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
+        _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
+        _inky.setLocation(Constants.INKY_STARTING_ROW,Constants.INKY_STARTING_COL);
+        _pinky.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
+        _clyde.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
     }
 
     public GhostPen getPen(){
         return _pen;
     }
 
-
+    private void setUpGameIsOverLabel(){
+        Label label = new Label();
+        label.setText("Game Over!");
+        label.setLayoutX(235);
+        label.setLayoutY(300);
+        label.setTextFill(Color.rgb(255, 255, 0));
+        label.setFont(new Font("Arial", Constants.GAME_IS_OVER_FONT_SIZE));
+        _boardPane.getChildren().add(label);
+    }
 }
 
 

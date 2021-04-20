@@ -51,6 +51,11 @@ public class GhostPen {
             if(_game.gameIsOver()){
                 _timeline.stop();
             } else {
+
+             //  if(_ghostPen.size()==4){
+             //       _penCounter = 0;
+              //  }
+
                 if(!_ghostPen.isEmpty()){
                     _penCounter++;
 
@@ -59,18 +64,23 @@ public class GhostPen {
                         Ghost currentGhost = (Ghost) _ghostPen.removeFirst();
 
                         _map[currentGhost.getRowLocation()][currentGhost.getColLocation()].getSquareElements().remove(currentGhost);
-                        currentGhost.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
-                        _map[currentGhost.getRowLocation()][currentGhost.getColLocation()].getSquareElements().remove(currentGhost);
-                    }
 
-                } else {
-                    _penCounter = 0;
+                        currentGhost.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
+
+                        _map[currentGhost.getRowLocation()][currentGhost.getColLocation()].getSquareElements().add(currentGhost);
+                    }
                 }
             }
         }
     }
 
+
+    public void setPenCounter(int value){
+        _penCounter = value;
+    }
+
     public void addToPen(Ghost ghost){
+
         _ghostPen.addLast(ghost);
 
         _map[ghost.getRowLocation()][ghost.getColLocation()].getSquareElements().remove(ghost);
@@ -89,6 +99,9 @@ public class GhostPen {
                 ghost.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
                 break;
         }
+
+        _map[ghost.getRowLocation()][ghost.getColLocation()].getSquareElements().add(ghost);
+
     }
 }
 
