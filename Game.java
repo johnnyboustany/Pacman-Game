@@ -107,22 +107,22 @@ public class Game {
                         _map[row][col].addToPane(_boardPane);
                         break;
                     case GHOST_START_LOCATION:
-                        _inky = new Ghost("inky", _boardPane, _map, this);
+                        _inky = new Ghost("inky", _map, this);
                         _inky.setLocation(row, col);
                         _inky.addToPane(_boardPane);
                         _map[row][col].getSquareElements().add(_inky);
 
-                        _clyde = new Ghost("clyde", _boardPane, _map, this);
+                        _clyde = new Ghost("clyde", _map, this);
                         _clyde.setLocation(row, col + 1);
                         _clyde.addToPane(_boardPane);
                         _map[row][col+1].getSquareElements().add(_clyde);
 
-                        _pinky = new Ghost("pinky", _boardPane, _map, this);
+                        _pinky = new Ghost("pinky", _map, this);
                         _pinky.setLocation(row, col - 1);
                         _pinky.addToPane(_boardPane);
                         _map[row][col-1].getSquareElements().add(_pinky);
 
-                        _blinky = new Ghost("blinky", _boardPane, _map, this);
+                        _blinky = new Ghost("blinky", _map, this);
                         _blinky.setLocation(row -2, col);
                         _blinky.addToPane(_boardPane);
                         _map[row-2][col].getSquareElements().add(_blinky);

@@ -35,7 +35,6 @@ public class GhostPen {
 
         _penCounter = 0;
         this.setUpTimeline();
-
     }
 
     private void setUpTimeline() {
@@ -45,40 +44,38 @@ public class GhostPen {
         _timeline.play();
     }
 
-
     private class TimeHandler implements EventHandler<ActionEvent> {
 
         public void handle(ActionEvent event) {
-
             if(_game.gameIsOver()){
                 _timeline.stop();
-            }
+            } else {
                 if(!_ghostPen.isEmpty()){
                     _penCounter++;
                 }
 
                 if(_blinky.isCollided()){
                     _ghostPen.addLast(_blinky);
-                    _blinky.setLocation(10,10);
-                    _blinky.noLongerCollided();
+                    _blinky.setLocation(Constants.BLINKY_STARTING_ROW+2,Constants.BLINKY_STARTING_COL);
+                    _blinky.setCollidedFalse();
                 }
 
                 if(_clyde.isCollided()){
                     _ghostPen.addLast(_clyde);
-                    _clyde.setLocation(10,10);
-                    _clyde.noLongerCollided();
+                    _clyde.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
+                    _clyde.setCollidedFalse();
                 }
 
                 if(_pinky.isCollided()){
                     _ghostPen.addLast(_pinky);
-                    _pinky.setLocation(10,10);
-                    _pinky.noLongerCollided();
+                    _pinky.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
+                    _pinky.setCollidedFalse();
                 }
 
                 if(_inky.isCollided()){
                     _ghostPen.addLast(_inky);
-                    _inky.setLocation(10,10);
-                    _inky.noLongerCollided();
+                    _inky.setLocation(Constants.INKY_STARTING_ROW,Constants.INKY_STARTING_COL);
+                    _inky.setCollidedFalse();
                 }
 
                 if(!_gameIsOver){
@@ -88,6 +85,7 @@ public class GhostPen {
                         currentGhost.setLocation(8,10);
                     }
                 }
+            }
 
         }
     }

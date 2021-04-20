@@ -9,17 +9,13 @@ import java.util.LinkedList;
 public class Ghost implements Collidable {
     private Rectangle _ghost;
     private Color _color;
-    private Pane _boardPane;
     private MazeSquare[][] _map;
     private boolean _collided;
     private Game _game;
 
-    public Ghost(String ghostName, Pane boardPane, MazeSquare[][] map, Game game) {
-
-        _game = game;
-        _collided = false;
-        _boardPane = boardPane;
+    public Ghost(String ghostName, MazeSquare[][] map, Game game) {
         _map = map;
+        _game = game;
 
         switch (ghostName) {
             case "pinky":
@@ -37,25 +33,7 @@ public class Ghost implements Collidable {
         }
 
         _ghost = new Rectangle(Constants.SQUARE_WIDTH, Constants.SQUARE_WIDTH, _color);
-
-    }
-
-    public void changeColor(Color color){
-        _ghost.setFill(color);
-    }
-
-    public void changeBackColor(){
-        _ghost.setFill(_color);
-    }
-
-    public void setLocation(int row, int col) {
-
-        _ghost.setY(row * Constants.SQUARE_WIDTH);
-        _ghost.setX(col * Constants.SQUARE_WIDTH);
-    }
-
-    public boolean isCollided() {
-        return _collided;
+        _collided = false;
     }
 
     @Override
@@ -65,34 +43,17 @@ public class Ghost implements Collidable {
         }
     }
 
-    public void noLongerCollided(){
-        _collided = false;
-    }
-
     @Override
     public String getType() {
         return "ghost";
     }
 
-    public int getColLocation() {
-        return (int) (_ghost.getX() / Constants.SQUARE_WIDTH);
+    public boolean isCollided() {
+        return _collided;
     }
 
-    /**
-     * This method allows the y-position of the tetris square to
-     * be retrieved (as an integer).
-     */
-    public int getRowLocation() {
-        return (int) (_ghost.getY() / Constants.SQUARE_WIDTH);
-    }
-
-
-    public void addToPane(Pane root) {
-        root.getChildren().add(_ghost);
-    }
-
-    public void removeFromPane(Pane root) {
-        root.getChildren().remove(_ghost);
+    public void setCollidedFalse(){
+        _collided = false;
     }
 
     public void move(Direction direction) {
@@ -119,10 +80,10 @@ public class Ghost implements Collidable {
     }
 
     public boolean moveIsValid(int rowOffset, int colOffset) {
-        int yLocation = (this.getRowLocation() + rowOffset) * Constants.SQUARE_WIDTH;
-        int xLocation = (this.getColLocation() + colOffset) * Constants.SQUARE_WIDTH;
+        int row = this.getRowLocation() + rowOffset;
+        int col = this.getColLocation() + colOffset;
 
-        if (_map[yLocation / Constants.SQUARE_WIDTH][xLocation / Constants.SQUARE_WIDTH].isWall()) {
+        if (_map[row][col].isWall()) {
             return false;
         }
         return true;
@@ -263,5 +224,35 @@ public class Ghost implements Collidable {
 
         }
         return directions[closestCoordinate.getRow()][closestCoordinate.getColumn()];
+    }
+
+    public void setLocation(int row, int col) {
+        _ghost.setY(row * Constants.SQUARE_WIDTH);
+        _ghost.setX(col * Constants.SQUARE_WIDTH);
+    }
+
+    /**
+     * This method allows the y-position of the tetris square to
+     * be retrieved (as an integer).
+     */
+    public int getRowLocation() {
+        return (int) (_ghost.getY() / Constants.SQUARE_WIDTH);
+    }
+
+    public int getColLocation() {
+        return (int) (_ghost.getX() / Constants.SQUARE_WIDTH);
+    }
+
+
+    public void changeColor(Color color){
+        _ghost.setFill(color);
+    }
+
+    public void changeBackColor(){
+        _ghost.setFill(_color);
+    }
+
+    public void addToPane(Pane root) {
+        root.getChildren().add(_ghost);
     }
 }
