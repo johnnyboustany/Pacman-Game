@@ -5,7 +5,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 public class Pacman {
-
     private Circle _pacman;
     private MazeSquare[][] _map;
 
@@ -64,7 +63,6 @@ public class Pacman {
     public int getRowLocation(){
         return (int) (_pacman.getCenterY()/Constants.SQUARE_WIDTH);
     }
-
 
     public void addToPane(Pane root){
         root.getChildren().add(_pacman);

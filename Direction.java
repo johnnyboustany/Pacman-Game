@@ -12,7 +12,6 @@ public enum Direction {
             case RIGHT: return 0;
             default: return 0;
         }
-
     }
 
     public int getColOffset(){
@@ -34,5 +33,4 @@ public enum Direction {
             default: return null;
         }
     }
-
 }

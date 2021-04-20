@@ -78,15 +78,12 @@ public class GhostPen {
                     _inky.setCollidedFalse();
                 }
 
-                if(!_gameIsOver){
-                    if(_penCounter==16){
-                        _penCounter = 0;
-                        Ghost currentGhost = (Ghost) _ghostPen.removeFirst();
-                        currentGhost.setLocation(8,10);
-                    }
+                if(_penCounter==16){
+                    _penCounter = 0;
+                    Ghost currentGhost = (Ghost) _ghostPen.removeFirst();
+                    currentGhost.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
                 }
             }
-
         }
     }
 }

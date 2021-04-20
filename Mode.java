@@ -4,7 +4,6 @@ public enum Mode {
 
     SCATTER, CHASE, FRIGHTENED;
 
-
     public Mode opposite(){
         switch(this){
             case CHASE: return SCATTER;
@@ -12,7 +11,4 @@ public enum Mode {
             default: return FRIGHTENED;
         }
     }
-
-
-
 }
