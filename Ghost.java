@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Ghost implements Collidable {
-
     private Rectangle _ghost;
     private Color _color;
     private Pane _boardPane;

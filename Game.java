@@ -344,7 +344,6 @@ public class Game {
         }
 
         public void resetGame(){
-
             _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
             _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
             _pinky.setLocation(Constants.PINKY_STARTING_ROW,Constants.PINKY_STARTING_COL);
@@ -365,7 +364,7 @@ public class Game {
             label.setLayoutX(235);
             label.setLayoutY(300);
             label.setTextFill(Color.rgb(255, 255, 0));
-            label.setFont(new Font("Arial", tetris.Constants.LABEL_2_FONT_SIZE));
+            label.setFont(new Font("Arial", Constants.GAME_IS_OVER_FONT_SIZE));
             _boardPane.getChildren().add(label);
         }
     }

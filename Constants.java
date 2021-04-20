@@ -32,6 +32,7 @@ public class Constants {
     public static final double DURATION = 0.25; // (s)
 
 
+    public static final int GAME_IS_OVER_FONT_SIZE = 40;
 
 
 
