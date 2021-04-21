@@ -65,7 +65,7 @@ public class Game {
         _outOfLives = false;
         _frightenedMode = false;
         _modeCounter = 0;
-        _lives = 10;
+        _lives = 3;
         _score = 0;
 
         this.setUpTimeline();
@@ -336,7 +336,6 @@ public class Game {
     }
 
     public boolean gameIsOver(){
-
         if(ifNoMoreDots() || _outOfLives){
             return true;
         } else {
@@ -370,7 +369,6 @@ public class Game {
     }
 
     public void resetGame(){
-
         _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
         _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
         _map[_clyde.getRowLocation()][_clyde.getColLocation()].getSquareElements().remove(_clyde);

@@ -55,13 +55,26 @@ public class GhostPen {
                 if(!_ghostPen.isEmpty()){
                     _penCounter++;
 
-                    if(_penCounter==4/Constants.DURATION){
+                    if(_penCounter==2.5/0.25){
                         _penCounter = 0;
                         Ghost currentGhost = (Ghost) _ghostPen.removeFirst();
 
                         _map[currentGhost.getRowLocation()][currentGhost.getColLocation()].getSquareElements().remove(currentGhost);
 
-                        currentGhost.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
+                        switch (currentGhost.getType()) {
+                            case "blinky":
+                                currentGhost.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
+                                break;
+                            case "inky":
+                                currentGhost.setLocation(Constants.BLINKY_STARTING_ROW+1,Constants.BLINKY_STARTING_COL);
+                                break;
+                            case "pinky":
+                                currentGhost.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL-1);
+                                break;
+                            case "clyde":
+                                currentGhost.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL+1);
+                                break;
+                        }
 
                         _map[currentGhost.getRowLocation()][currentGhost.getColLocation()].getSquareElements().add(currentGhost);
                     }
