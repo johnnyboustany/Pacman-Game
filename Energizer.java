@@ -13,13 +13,13 @@ public class Energizer implements Collidable{
         _game = game;
         _boardPane = boardPane;
         _energizer = new Circle();
-        _energizer.setRadius(8);
+        _energizer.setRadius(Constants.ENERGIZER_RADIUS);
         _energizer.setFill(Color.WHITE);
     }
 
     @Override
     public void collide() {
-        _game.addToScore(100);
+        _game.addToScore(Constants.SCORE_INCREMENT_ENERGIZER);
         _game.setFrightenedMode();
         _boardPane.getChildren().remove(_energizer);
     }

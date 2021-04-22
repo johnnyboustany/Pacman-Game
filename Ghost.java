@@ -38,7 +38,7 @@ public class Ghost implements Collidable {
     @Override
     public void collide() {
         if(_game.isInFrightenedMode()){
-            _game.addToScore(200);
+            _game.addToScore(Constants.SCORE_INCREMENT_GHOST);
             _game.getPen().addToPen(this);
         } else {
             _game.killPacman();
@@ -56,19 +56,19 @@ public class Ghost implements Collidable {
         int rowOffset = direction.getRowOffset();
         int colOffset = direction.getColOffset();
 
-        if(this.getColLocation() + colOffset >= 0 && this.getColLocation() + colOffset <= 22) {
+        if(this.getColLocation() + colOffset >= 0 && this.getColLocation() + colOffset <= Constants.MAZE_UPPER_BOUND) {
             if (moveIsValid(rowOffset, colOffset)) {
                 _map[this.getRowLocation() + rowOffset][this.getColLocation() + colOffset].getSquareElements().add(this);
                 this.setLocation(this.getRowLocation() + rowOffset, this.getColLocation() + colOffset);
             }
         } else {
             if(this.getColLocation() + colOffset < 0){
-                this.setLocation(11,22);
-                _map[11][22].getSquareElements().add(this);
+                this.setLocation(Constants.ROW_OF_TUNNELS, Constants.MAZE_UPPER_BOUND);
+                _map[Constants.ROW_OF_TUNNELS][Constants.MAZE_UPPER_BOUND].getSquareElements().add(this);
 
-            } else if(this.getColLocation() + colOffset > 22){
-                this.setLocation(11,0);
-                _map[11][0].getSquareElements().add(this);
+            } else if(this.getColLocation() + colOffset > Constants.MAZE_UPPER_BOUND){
+                this.setLocation(Constants.ROW_OF_TUNNELS,0);
+                _map[Constants.ROW_OF_TUNNELS][Constants.MAZE_UPPER_BOUND].getSquareElements().add(this);
             }
         }
     }
@@ -98,11 +98,11 @@ public class Ghost implements Collidable {
             _validDirections.add(Direction.UP);
         }
 
-        if(ghostColumn+1 < 22 && !(_map[ghostRow][ghostColumn+1].isWall()) && currentDirection.opposite() != Direction.RIGHT){
+        if(ghostColumn+1 < Constants.MAZE_UPPER_BOUND && !(_map[ghostRow][ghostColumn+1].isWall()) && currentDirection.opposite() != Direction.RIGHT){
             _validDirections.add(Direction.RIGHT);
         }
 
-        if(ghostColumn+1 >= 22 && !(_map[ghostRow][0].isWall()) && currentDirection.opposite() != Direction.RIGHT){
+        if(ghostColumn+1 >= Constants.MAZE_UPPER_BOUND && !(_map[ghostRow][0].isWall()) && currentDirection.opposite() != Direction.RIGHT){
             _validDirections.add(Direction.RIGHT);
         }
 
@@ -110,7 +110,7 @@ public class Ghost implements Collidable {
             _validDirections.add(Direction.LEFT);
         }
 
-        if(ghostColumn-1 <= 0 && !_map[ghostRow][22].isWall() && currentDirection.opposite() != Direction.LEFT){
+        if(ghostColumn-1 <= 0 && !_map[ghostRow][Constants.MAZE_UPPER_BOUND].isWall() && currentDirection.opposite() != Direction.LEFT){
             _validDirections.add(Direction.LEFT);
         }
 
@@ -145,13 +145,13 @@ public class Ghost implements Collidable {
             directions[ghostRow][ghostColumn] = directions[ghostRow-1][ghostColumn] ;
         }
 
-        if(ghostColumn+1 < 22 && !(_map[ghostRow][ghostColumn+1].isWall()) && ghostDirection.opposite() != Direction.RIGHT){
+        if(ghostColumn+1 < Constants.MAZE_UPPER_BOUND && !(_map[ghostRow][ghostColumn+1].isWall()) && ghostDirection.opposite() != Direction.RIGHT){
             Q.addLast(new BoardCoordinate(ghostRow,ghostColumn+1, false));
             directions[ghostRow][ghostColumn+1] = Direction.RIGHT;
             directions[ghostRow][ghostColumn] = Direction.RIGHT;
         }
 
-        if(ghostColumn+1 >= 22 && !(_map[ghostRow][0].isWall()) && ghostDirection.opposite() != Direction.RIGHT){
+        if(ghostColumn+1 >= Constants.MAZE_UPPER_BOUND && !(_map[ghostRow][0].isWall()) && ghostDirection.opposite() != Direction.RIGHT){
             Q.addLast(new BoardCoordinate(ghostRow,0, false));
             directions[ghostRow][0] = Direction.RIGHT;
             directions[ghostRow][ghostColumn] = Direction.RIGHT;
@@ -163,9 +163,9 @@ public class Ghost implements Collidable {
             directions[ghostRow][ghostColumn] = Direction.LEFT;
         }
 
-        if(ghostColumn-1 <= 0 && !_map[ghostRow][22].isWall() && ghostDirection.opposite() != Direction.LEFT){
-            Q.addLast(new BoardCoordinate(ghostRow,22, false));
-            directions[ghostRow][22] = Direction.LEFT;
+        if(ghostColumn-1 <= 0 && !_map[ghostRow][Constants.MAZE_UPPER_BOUND].isWall() && ghostDirection.opposite() != Direction.LEFT){
+            Q.addLast(new BoardCoordinate(ghostRow,Constants.MAZE_UPPER_BOUND, false));
+            directions[ghostRow][Constants.MAZE_UPPER_BOUND] = Direction.LEFT;
             directions[ghostRow][ghostColumn] = Direction.LEFT;
         }
 
@@ -186,22 +186,22 @@ public class Ghost implements Collidable {
             int currentRow = currentCoordinate.getRow();
             int currentColumn = currentCoordinate.getColumn();
 
-            if(currentColumn < 22 && currentColumn > 0 && currentRow+1 < 22 && currentRow+1 > 0 && !(_map[currentRow+1][currentColumn].isWall()) && directions[currentRow+1][currentColumn]== null ){
+            if(currentColumn < Constants.MAZE_UPPER_BOUND && currentColumn > 0 && currentRow+1 <Constants.MAZE_UPPER_BOUND && currentRow+1 > 0 && !(_map[currentRow+1][currentColumn].isWall()) && directions[currentRow+1][currentColumn]== null ){
                 Q.addLast(new BoardCoordinate(currentRow+1,currentColumn, false));
                 directions[currentRow+1][currentColumn] = directions[currentRow][currentColumn];
             }
 
-            if(currentColumn < 22 && currentColumn > 0 && currentRow-1 < 22 && currentRow-1 > 0 && !(_map[currentRow-1][currentColumn].isWall()) && directions[currentRow-1][currentColumn] == null){
+            if(currentColumn < Constants.MAZE_UPPER_BOUND && currentColumn > 0 && currentRow-1 < Constants.MAZE_UPPER_BOUND && currentRow-1 > 0 && !(_map[currentRow-1][currentColumn].isWall()) && directions[currentRow-1][currentColumn] == null){
                 Q.addLast(new BoardCoordinate(currentRow-1,currentColumn, false));
                 directions[currentRow-1][currentColumn] =  directions[currentRow][currentColumn];
             }
 
-            if( currentColumn+1 < 22 && !(_map[currentRow][currentColumn+1].isWall()) && directions[currentRow][currentColumn+1] == null){
+            if( currentColumn+1 < Constants.MAZE_UPPER_BOUND && !(_map[currentRow][currentColumn+1].isWall()) && directions[currentRow][currentColumn+1] == null){
                 Q.addLast(new BoardCoordinate(currentRow,currentColumn+1, false));
                 directions[currentRow][currentColumn+1] =  directions[currentRow][currentColumn];
             }
 
-            if( currentColumn+1 >= 22 && !(_map[currentRow][0].isWall()) && directions[currentRow][0] == null){
+            if( currentColumn+1 >= Constants.MAZE_UPPER_BOUND && !(_map[currentRow][0].isWall()) && directions[currentRow][0] == null){
                 Q.addLast(new BoardCoordinate(currentRow,0, false));
                 directions[currentRow][0] =  directions[currentRow][currentColumn];
             }
@@ -211,9 +211,9 @@ public class Ghost implements Collidable {
                 directions[currentRow][currentColumn-1] = directions[currentRow][currentColumn];
             }
 
-            if(currentColumn-1 <= 0 && !(_map[currentRow][22].isWall()) && directions[currentRow][22] == null){
-                Q.addLast(new BoardCoordinate(currentRow,22, false));
-                directions[currentRow][22] =  directions[currentRow][currentColumn];
+            if(currentColumn-1 <= 0 && !(_map[currentRow][Constants.MAZE_UPPER_BOUND].isWall()) && directions[currentRow][Constants.MAZE_UPPER_BOUND] == null){
+                Q.addLast(new BoardCoordinate(currentRow,Constants.MAZE_UPPER_BOUND, false));
+                directions[currentRow][Constants.MAZE_UPPER_BOUND] =  directions[currentRow][currentColumn];
             }
 
         }

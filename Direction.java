@@ -6,8 +6,8 @@ public enum Direction {
 
     public int getRowOffset(){
        switch(this){
-            case UP: return -1;
-            case DOWN: return 1;
+            case UP: return -Constants.MOVE_OFFSET;
+            case DOWN: return Constants.MOVE_OFFSET;
             case LEFT: return 0;
             case RIGHT: return 0;
             default: return 0;
@@ -18,8 +18,8 @@ public enum Direction {
         switch(this){
             case UP: return 0;
             case DOWN: return 0;
-            case LEFT: return -1;
-            case RIGHT: return 1;
+            case LEFT: return -Constants.MOVE_OFFSET;
+            case RIGHT: return Constants.MOVE_OFFSET;
             default: return 0;
         }
     }

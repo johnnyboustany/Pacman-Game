@@ -28,13 +28,13 @@ public class Sidebar {
 
         _label1 = new Label("Lives:");
         _label1.setTextFill(Color.rgb(255, 255, 255));
-        _label1.setFont(new Font("Arial", 14));
+        _label1.setFont(new Font("Arial", Constants.LIVES_SCORE_FONT_SIZE));
         _label1.setAlignment(Pos.CENTER_LEFT);
         _sidebarPane.getChildren().add(_label1);
 
         _label2 = new Label("Score:" + 0);
         _label2.setTextFill(Color.rgb(255, 255, 255));
-        _label2.setFont(new Font("Arial", 14));
+        _label2.setFont(new Font("Arial", Constants.LIVES_SCORE_FONT_SIZE));
         _label2.setAlignment(Pos.CENTER);
         _sidebarPane.getChildren().add(_label2);
     }

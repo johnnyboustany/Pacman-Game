@@ -11,7 +11,7 @@ public class Pacman {
     public Pacman(MazeSquare[][] _map2D){
         _map = _map2D;
         _pacman = new Circle();
-        _pacman.setRadius(13);
+        _pacman.setRadius(Constants.PACMAN_RADIUS);
         _pacman.setFill(Color.YELLOW);
     }
 
@@ -24,7 +24,7 @@ public class Pacman {
         int rowOffset = direction.getRowOffset();
         int colOffset = direction.getColOffset();
 
-        if(this.getColLocation() + colOffset >= 0 && this.getColLocation() + colOffset <= 22){
+        if(this.getColLocation() + colOffset >= 0 && this.getColLocation() + colOffset <= Constants.MAZE_UPPER_BOUND){
 
             if(moveIsValid(rowOffset,colOffset)){
             _pacman.setCenterY((this.getRowLocation() + rowOffset)*Constants.SQUARE_WIDTH+(Constants.SQUARE_WIDTH/2));
@@ -34,10 +34,10 @@ public class Pacman {
         } else {
 
             if(this.getColLocation() + colOffset < 0){
-                this.setLocation(11,22);
+                this.setLocation(Constants.ROW_OF_TUNNELS,Constants.MAZE_UPPER_BOUND);
 
-            } else if(this.getColLocation() + colOffset > 22){
-                this.setLocation(11,0);
+            } else if(this.getColLocation() + colOffset > Constants.MAZE_UPPER_BOUND){
+                this.setLocation(Constants.ROW_OF_TUNNELS,0);
             }
         }
         }

@@ -13,7 +13,7 @@ public class MazeSquare {
     public MazeSquare() {
         _rect = new Rectangle(Constants.SQUARE_WIDTH, Constants.SQUARE_WIDTH);
         _rect.setStroke(Color.BLACK);
-        _rect.setStrokeWidth(2);
+        _rect.setStrokeWidth(Constants.MAZESQUARE_STROKE_WIDTH);
         _squareElements = new ArrayList<>();
     }
 

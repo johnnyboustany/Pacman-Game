@@ -14,13 +14,13 @@ public class Dot implements Collidable{
         _game = game;
 
         _dot = new Circle();
-        _dot.setRadius(4);
+        _dot.setRadius(Constants.DOT_RADIUS);
         _dot.setFill(Color.WHITE);
     }
 
     @Override
     public void collide() {
-        _game.addToScore(10);
+        _game.addToScore(Constants.SCORE_INCREMENT_DOT);
         this.removeFromPane(_boardPane);
     }
 

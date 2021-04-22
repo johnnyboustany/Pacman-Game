@@ -13,33 +13,41 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
+/**
+ * The Game class is the top-level logic class. It stores
+ * boardPane (which is passed in from the PaneOrganizer class)
+ * in an instance variable. It also stores a 2D Array
+ * of MazeSquares that is used to represent the board in an instance variable.
+ * Also, it sets up the board with the 4 ghosts and adds 3 of them
+ * to the ghost pen.
+ */
 public class Game {
     private MazeSquare[][] _map;
     private Pane _boardPane;
-    private Pacman _pacman;
+    private Sidebar _sidebar;
     private Timeline _timeline;
+    private Pacman _pacman;
     private Direction _pacmanDirection;
     private BoardCoordinate _pacmanCoordinate;
+    private Ghost _blinky;
     private Direction _blinkyDirection;
     private BoardCoordinate _blinkyCoordinate;
+    private Ghost _pinky;
     private Direction _pinkyDirection;
     private BoardCoordinate _pinkyCoordinate;
+    private Ghost _clyde;
     private Direction _clydeDirection;
     private BoardCoordinate _clydeCoordinate;
+    private Ghost _inky;
     private Direction _inkyDirection;
     private BoardCoordinate _inkyCoordinate;
-    private int _score;
-    private Sidebar _sidebar;
-    private Ghost _blinky;
-    private Ghost _inky;
-    private Ghost _pinky;
-    private Ghost _clyde;
+    public GhostPen _pen;
     private Mode _mode;
+    private int _score;
+    private int _lives;
     private int _modeCounter;
     private int _frightenedCounter;
     private boolean _frightenedMode;
-    public GhostPen _pen;
-    private  int _lives;
     private boolean _outOfLives;
 
     public Game(Pane boardPane, Sidebar sidebar) {
@@ -59,14 +67,15 @@ public class Game {
         _clydeCoordinate = new BoardCoordinate(_clyde.getRowLocation(), _clyde.getColLocation(), false);
         _inkyCoordinate = new BoardCoordinate(_inky.getRowLocation(), _inky.getColLocation(), false);
 
-        _pen = new GhostPen(_blinky, _pinky, _clyde, _inky,this, _map);
+        _pen = new GhostPen(_pinky, _clyde, _inky,this, _map);
 
         _mode = Mode.CHASE;
         _outOfLives = false;
         _frightenedMode = false;
         _modeCounter = 0;
-        _lives = 3;
-        _score = 0;
+
+        _lives = Constants.INITIAL_LIVES;
+        _score = Constants.INITIAL_SCORE;
 
         this.setUpTimeline();
         _boardPane.addEventHandler(KeyEvent.KEY_PRESSED, new KeyHandler());
@@ -119,19 +128,19 @@ public class Game {
                         _map[row][col].getSquareElements().add(_inky);
 
                         _clyde = new Ghost("clyde", _map, this);
-                        _clyde.setLocation(row, col + 1);
+                        _clyde.setLocation(row, col + Constants.CLYDE_SHIFTED);
                         _clyde.addToPane(_boardPane);
-                        _map[row][col+1].getSquareElements().add(_clyde);
+                        _map[row][col+ Constants.CLYDE_SHIFTED].getSquareElements().add(_clyde);
 
                         _pinky = new Ghost("pinky", _map, this);
-                        _pinky.setLocation(row, col - 1);
+                        _pinky.setLocation(row, col - Constants.PINKY_SHIFTED);
                         _pinky.addToPane(_boardPane);
-                        _map[row][col-1].getSquareElements().add(_pinky);
+                        _map[row][col- Constants.PINKY_SHIFTED].getSquareElements().add(_pinky);
 
                         _blinky = new Ghost("blinky", _map, this);
-                        _blinky.setLocation(row -2, col);
+                        _blinky.setLocation(row - Constants.BLINKY_SHIFTED, col);
                         _blinky.addToPane(_boardPane);
-                        _map[row-2][col].getSquareElements().add(_blinky);
+                        _map[row-Constants.BLINKY_SHIFTED][col].getSquareElements().add(_blinky);
                         break;
                     case PACMAN_START_LOCATION:
                         _pacman = new Pacman(_map);
@@ -153,22 +162,22 @@ public class Game {
             if(!gameIsOver()){
                 switch (keyEvent.getCode()) {
                     case LEFT:
-                        if(_pacmanCoordinate.getColumn() > 1 &&_pacman.moveIsValid(0,-1)){
+                        if(_pacmanCoordinate.getColumn() > Constants.PACMAN_X_LOWER &&_pacman.moveIsValid(0,-Constants.MOVE_OFFSET)){
                             _pacmanDirection = Direction.LEFT;
                         }
                         break;
                     case RIGHT:
-                        if(_pacmanCoordinate.getColumn() < 21 && _pacman.moveIsValid(0,1)){
+                        if(_pacmanCoordinate.getColumn() < Constants.PACMAN_X_UPPER && _pacman.moveIsValid(0,Constants.MOVE_OFFSET)){
                             _pacmanDirection = Direction.RIGHT;
                         }
                         break;
                     case DOWN:
-                        if(_pacman.moveIsValid(1,0)){
+                        if(_pacman.moveIsValid(Constants.MOVE_OFFSET,0)){
                             _pacmanDirection = Direction.DOWN;
                         }
                         break;
                     case UP:
-                        if(_pacman.moveIsValid(-1,0)){
+                        if(_pacman.moveIsValid(-Constants.MOVE_OFFSET,0)){
                             _pacmanDirection = Direction.UP;
                         }
                         break;
@@ -231,11 +240,11 @@ public class Game {
             if(!_frightenedMode){
                 _modeCounter++;
 
-                if(_modeCounter==20/Constants.DURATION){
+                if(_modeCounter==Constants.CHASE_MODE_DURATION/Constants.DURATION){
                     _mode = _mode.opposite();
                 }
 
-                if(_modeCounter==(20+7)/Constants.DURATION){
+                if(_modeCounter==(Constants.CHASE_MODE_DURATION+Constants.SCATTER_MODE_DURATION)/Constants.DURATION){
                     _mode = _mode.opposite();
                     _modeCounter = 0;
                 }
@@ -248,7 +257,7 @@ public class Game {
                 _pinky.changeColor(Color.CYAN);
                 _inky.changeColor(Color.CYAN);
 
-                if(_frightenedCounter == 8/Constants.DURATION){
+                if(_frightenedCounter == (Constants.FRIGHTENED_MODE_DURATION)/Constants.DURATION){
                     _frightenedCounter = 0;
                     _modeCounter = 0;
 
@@ -269,13 +278,13 @@ public class Game {
                     _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection,_pacmanCoordinate);
                     _blinky.move(_blinkyDirection);
 
-                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(_pacman.getRowLocation()+1,_pacman.getColLocation()-3, true));
+                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(_pacman.getRowLocation()+Constants.PINKY_CHASE_OFFSET_ROW,_pacman.getColLocation()-Constants.PINKY_CHASE_OFFSET_COL, true));
                     _pinky.move(_pinkyDirection);
 
-                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(_pacman.getRowLocation()-4,_pacman.getColLocation(), true));
+                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(_pacman.getRowLocation()-Constants.CLYDE_CHASE_OFFSET_ROW,_pacman.getColLocation(), true));
                     _clyde.move(_clydeDirection);
 
-                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(_pacman.getRowLocation(),_pacman.getColLocation()+2,true));
+                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(_pacman.getRowLocation(),_pacman.getColLocation()+Constants.INKY_CHASE_OFFSET_COL,true));
                     _inky.move(_inkyDirection);
                     break;
                 case SCATTER:
@@ -324,7 +333,6 @@ public class Game {
     public boolean ifNoMoreDots() {
         for (int row = 0; row < Constants.MAZE_DIMENSION; row++) {
             for (int col = 0; col < Constants.MAZE_DIMENSION; col++) {
-
                 for(int i = 0; i < _map[row][col].getSquareElements().size(); i++){
                     if(_map[row][col].containsDot(i) || _map[row][col].containsEnergizer(i)){
                         return false;
@@ -356,7 +364,7 @@ public class Game {
     }
 
     public void killPacman(){
-        if(_lives > 1){
+        if(_lives > Constants.LAST_LIFE){
             _lives--;
             this.resetGame();
         } else {
@@ -411,8 +419,8 @@ public class Game {
     private void setUpGameIsOverLabel(){
         Label label = new Label();
         label.setText("Game Over!");
-        label.setLayoutX(235);
-        label.setLayoutY(300);
+        label.setLayoutX(Constants.GAME_IS_OVER_X);
+        label.setLayoutY(Constants.GAME_IS_OVER_Y);
         label.setTextFill(Color.rgb(255, 255, 0));
         label.setFont(new Font("Arial", Constants.GAME_IS_OVER_FONT_SIZE));
         _boardPane.getChildren().add(label);
