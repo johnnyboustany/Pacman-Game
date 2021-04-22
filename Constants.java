@@ -2,7 +2,6 @@ package pacman;
 
 public class Constants {
 
-
     public static final int PANE_WIDTH = 690; // (UNITS: pixels)
     public static final int PANE_HEIGHT = 715; // (UNITS: pixels)
     public static final int LABEL_SPACING = 200; // (UNITS: pixels)

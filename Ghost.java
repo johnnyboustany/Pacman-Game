@@ -6,6 +6,12 @@ import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+/**
+ * The Ghost class creates the shape of the ghost.
+ * This is a wrapper class that contains
+ * a ghost. It implements the Collidable interface as it
+ * defines the collide method.
+ */
 public class Ghost implements Collidable {
     private Rectangle _ghost;
     private Color _color;
@@ -13,6 +19,10 @@ public class Ghost implements Collidable {
     private Game _game;
     private String _ghostName;
 
+    /**
+     * The Ghost class uses the 2D map array from the Game class
+     * in its move and moveIsValid methods.
+     */
     public Ghost(String ghostName, MazeSquare[][] map, Game game) {
         _map = map;
         _game = game;

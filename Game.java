@@ -385,7 +385,7 @@ public class Game {
         for (int row = 0; row < Constants.MAZE_DIMENSION; row++) {
             for (int col = 0; col < Constants.MAZE_DIMENSION; col++) {
                 for(int i = 0; i < _map[row][col].getSquareElements().size(); i++){
-                    if(_map[row][col].containsDot(i) || _map[row][col].containsEnergizer(i)){
+                    if(_map[row][col].containsDotOrEnergizer(i)){
                         return false;
                     }
                 }
@@ -433,7 +433,6 @@ public class Game {
         _score = _score + scoreIncrement;
     }
 
-
     /**
      * This public method is executed by the ghost's collide method
      * when pacman collides with a ghost and the ghost is not in
@@ -463,12 +462,19 @@ public class Game {
         }
     }
 
+    /**
+     * This private method is executed to reset the game when
+     * pacman loses a life (and when it is not out of lives yet).
+     */
     private void resetGame(){
+        // before the ghosts are set to new positions,
+        // all ghosts get removed from the arraylists of their current squares
         _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
         _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
         _map[_clyde.getRowLocation()][_clyde.getColLocation()].getSquareElements().remove(_clyde);
         _map[_inky.getRowLocation()][_inky.getColLocation()].getSquareElements().remove(_inky);
 
+        // all directions are re-initialized
         _pacmanDirection = Direction.INITIAL;
         _blinkyDirection = Direction.RIGHT;
         _pinkyDirection = Direction.RIGHT;
@@ -476,22 +482,36 @@ public class Game {
         _inkyDirection = Direction.RIGHT;
 
         _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
-        _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
 
+        // blinky is set to its position outside of the pen and is added to the arraylist
+        // of this position
+        _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
         _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().add(_blinky);
 
+        // counter for pen is restarted so that the ghosts get released one by one
         _pen.setPenCounter(0);
+
+        // pinky, inky and clyde are sent back to the pen
         _pen.addToPen(_pinky);
         _pen.addToPen(_inky);
         _pen.addToPen(_clyde);
     }
 
+    /**
+     * This private method is executed to end the game when
+     * pacman loses its last life.
+     */
     private void endGame(){
+
+        // this ensures that the game ends with the ghosts
+        // displaying their original colors (and not cyan blue,
+        // if the game ends wih the ghosts in frightened mode)
         _blinky.changeBackColor();
         _clyde.changeBackColor();
         _pinky.changeBackColor();
         _inky.changeBackColor();
 
+        // ghosts are returned to their starting positions
         _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
         _blinky.setLocation(Constants.BLINKY_STARTING_ROW,Constants.BLINKY_STARTING_COL);
         _inky.setLocation(Constants.INKY_STARTING_ROW,Constants.INKY_STARTING_COL);
@@ -499,6 +519,10 @@ public class Game {
         _clyde.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
     }
 
+    /**
+     * This private method sets up the game is over label
+     * and adds it to the boardPane.
+     */
     private void setUpGameIsOverLabel(){
         Label label = new Label();
         label.setText("Game Over!");
@@ -509,6 +533,11 @@ public class Game {
         _boardPane.getChildren().add(label);
     }
 
+    /**
+     * Instead of the ghost class being associated with the pen,
+     * this public method allows the ghost to access the pen
+     * (and add itself to it).
+     */
     public GhostPen getPen(){
         return _pen;
     }
