@@ -29,30 +29,49 @@ public class Energizer implements Collidable{
     }
 
     /**
-     * The collide method increments the score
-     * and graphically removes the dot.
+     * The collide method increments the score, sets game mode
+     * to frightened and graphically removes the energizer.
      *
      */
     @Override
     public void collide() {
         _game.addToScore(Constants.SCORE_INCREMENT_ENERGIZER);
         _game.setFrightenedMode();
-        _boardPane.getChildren().remove(_energizer);
+        this.removeFromPane(_boardPane);
     }
 
+    /**
+     * This method is used to return the type of this Collidable, which is energizer.
+     * This allows the Game to know if a square contains an energizer
+     * (when checking if game is over).
+     *
+     */
     @Override
     public String getType() {
         return "energizer";
     }
 
+    /**
+     * This method sets the location of the energizer
+     * based on row and column values by converting between
+     * row/column values and pixels.
+     */
     public void setLocation(int row, int col){
         _energizer.setCenterY(row*Constants.SQUARE_WIDTH+(Constants.SQUARE_WIDTH/2));
         _energizer.setCenterX(col*Constants.SQUARE_WIDTH+(Constants.SQUARE_WIDTH/2));
     }
 
+    /**
+     *  This public method adds the energizer to a root pane.
+     */
     public void addToPane(Pane root){
         root.getChildren().add(_energizer);
     }
 
-
+    /**
+     *  This public method removes the energizer from a root pane.
+     */
+    public void removeFromPane(Pane root){
+        root.getChildren().remove(_energizer);
+    }
 }
