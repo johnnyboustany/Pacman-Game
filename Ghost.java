@@ -237,7 +237,6 @@ public class Ghost implements Collidable {
         return (int) (_ghost.getX() / Constants.SQUARE_WIDTH);
     }
 
-
     public void changeColor(Color color){
         _ghost.setFill(color);
     }

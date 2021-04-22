@@ -50,12 +50,20 @@ public class Game {
     private boolean _frightenedMode;
     private boolean _outOfLives;
 
+    /**
+     * This is the Game class constructor, it takes in the boardPane
+     * and assigns it to the declared instance variable. It also
+     * instantiates the sidebar, which helps setup relevant labels. It also
+     * instantiates the 2D Array for the board and sets up the board via
+     * a helper method. It instantiates the pen and adds the 3 ghosts to it.
+     * It also initializes the lives and score counter.
+     */
     public Game(Pane boardPane, Sidebar sidebar) {
         _boardPane = boardPane;
         _sidebar = sidebar;
         this.setUpBoard();
 
-        //initializing
+        //initializing the direction & coordinates of pacman and the 4 ghosts
         _pacmanDirection = Direction.INITIAL;
         _blinkyDirection = Direction.RIGHT;
         _pinkyDirection = Direction.RIGHT;
@@ -69,10 +77,10 @@ public class Game {
 
         _pen = new GhostPen(_pinky, _clyde, _inky,this, _map);
 
-        _mode = Mode.CHASE;
-        _outOfLives = false;
-        _frightenedMode = false;
-        _modeCounter = 0;
+        _mode = Mode.CHASE; // the game starts out in chase mode
+        _outOfLives = false; // pacman is not out of lives at the start of the game
+        _frightenedMode = false; // frightened mode is only activated when this variable is set to true
+        _modeCounter = 0; // initializing counter used to switch between chase & target mode
 
         _lives = Constants.INITIAL_LIVES;
         _score = Constants.INITIAL_SCORE;
@@ -82,6 +90,10 @@ public class Game {
         _boardPane.setFocusTraversable(true);
     }
 
+    /**
+     * This method uses the supportMap to set all elements
+     * in their appropriate positions on the map.
+     */
     public void setUpBoard() {
         SquareType[][] supportMap = cs15.fnl.pacmanSupport.SupportMap.getSupportMap();
         _map = new MazeSquare[Constants.MAZE_DIMENSION][Constants.MAZE_DIMENSION];
@@ -93,8 +105,9 @@ public class Game {
                 square.setXLocation(col * Constants.SQUARE_WIDTH);
                 square.setYLocation(row * Constants.SQUARE_WIDTH);
 
-                _map[row][col] = square;
+                _map[row][col] = square; // creating new squares and placing each at a position on the map
 
+                // placing dots and energizer first, so that they appear under the ghosts and pacman  on map
                 switch (supportMap[row][col]) {
                     case DOT:
                         Dot dot = new Dot(_boardPane, this);
@@ -109,10 +122,10 @@ public class Game {
                         _map[row][col].getSquareElements().add(energizer);
                         break;
                 }
-
             }
         }
 
+        // placing walls, ghosts and pacman on map
         for (int row = 0; row < Constants.MAZE_DIMENSION; row++) {
             for (int col = 0; col < Constants.MAZE_DIMENSION; col++) {
 
@@ -152,21 +165,32 @@ public class Game {
         }
     }
 
+    /**
+     * The private class KeyHandler implements an event handler and knows how to handle
+     * events of type KeyEvent. This assigns a direction to pacman's direction instance variable
+     * that will be passed into pacman's move method at every time-step.
+     *
+     */
     private class KeyHandler implements EventHandler<KeyEvent> {
-
-        public KeyHandler() {
-        }
-
+        /**
+         * The handle method determines what should happen
+         * when the user presses the different keys. It only
+         * allows key interaction when the game is not over.
+         *
+         */
         public void handle(KeyEvent keyEvent) {
-
             if(!gameIsOver()){
                 switch (keyEvent.getCode()) {
                     case LEFT:
+                        // a condition is placed to prevent the user from pressing
+                        // the left key when the pacman is already moving left and approaching the left tunnel square
                         if(_pacmanCoordinate.getColumn() > Constants.PACMAN_X_LOWER &&_pacman.moveIsValid(0,-Constants.MOVE_OFFSET)){
                             _pacmanDirection = Direction.LEFT;
                         }
                         break;
                     case RIGHT:
+                        // a condition is placed to prevent the user from pressing
+                        // the right key when the pacman is already moving right and approaching the right tunnel square
                         if(_pacmanCoordinate.getColumn() < Constants.PACMAN_X_UPPER && _pacman.moveIsValid(0,Constants.MOVE_OFFSET)){
                             _pacmanDirection = Direction.RIGHT;
                         }
@@ -202,65 +226,87 @@ public class Game {
      * and handles events of type ActionEvent.
      */
     private class TimeHandler implements EventHandler<ActionEvent> {
-
         /**
-         * The handle method controls the y-movement/falling
-         * of the piece, adds landed squares to the board, creates new pieces,
-         * clears full lines, and checks if the game is over.
+         *
          */
         public void handle(ActionEvent event) {
             if(gameIsOver()){
-                endGame();
+                // if the dots/energizers are all collided with or pacman lost all its 3 lives
 
-                if(ifNoMoreDots()){
-                    setUpGameIsOverLabel();
+                Game.this.endGame(); // places all elements back in starting position
+
+                // the game is over label is set up at the start of the handle method
+                // if there are no more dots/energizers whereas, for the case when pacman loses
+                // all its lives, the label is setup exactly when the pacman loses its last life
+                if(noMoreDotsOrEnergizers()){
+                    Game.this.setUpGameIsOverLabel();
                 }
                 _timeline.stop();
             } else {
+
+                // sets the current mode by alternating between chase & target
+                // mode and checking for frightened mode
                 this.setMode();
 
+                // updates the coordinates for pacman and the ghosts based on their current locations
                 _pacmanCoordinate = new BoardCoordinate(_pacman.getRowLocation(), _pacman.getColLocation(), false);
                 _blinkyCoordinate = new BoardCoordinate(_blinky.getRowLocation(), _blinky.getColLocation(), false);
                 _pinkyCoordinate = new BoardCoordinate(_pinky.getRowLocation(), _pinky.getColLocation(), false);
                 _clydeCoordinate = new BoardCoordinate(_clyde.getRowLocation(), _clyde.getColLocation(), false);
                 _inkyCoordinate = new BoardCoordinate(_inky.getRowLocation(), _inky.getColLocation(), false);
 
-                _pacman.move(_pacmanDirection);
+                _pacman.move(_pacmanDirection); // pacman is moved based on direction set by the user Key interaction
                 this.checkForCollision();
-
                 this.moveGhosts();
+                // edge case is avoided by checking for collision before and after the ghosts ae moved
                 this.checkForCollision();
 
+                // score and lives counts are updated at every time-step
                 _sidebar.updateScoreLabel(_score);
                 _sidebar.updateLivesLabel(_lives);
             }
         }
 
-        public void setMode(){
+        /**
+         * Mode is set based on the boolean variable for frightened Mode.
+         * A mode counter is used to switch between chase and target modes.
+         * A frightened mode counter is used to set how long the mode lasts.
+         */
+        private void setMode(){
             if(!_frightenedMode){
+                // if the pacman doesn't eat the energizer, the mode counter increments itself
                 _modeCounter++;
 
+                // the game starts in chase mode and is changed to scatter mode after
+                // a specific duration of time
                 if(_modeCounter==Constants.CHASE_MODE_DURATION/Constants.DURATION){
                     _mode = _mode.opposite();
                 }
 
+                // the game is set back to chase mode
                 if(_modeCounter==(Constants.CHASE_MODE_DURATION+Constants.SCATTER_MODE_DURATION)/Constants.DURATION){
                     _mode = _mode.opposite();
                     _modeCounter = 0;
                 }
             } else {
+                // if the pacman eats the energizer, the frightened mode counter increments itself
                 _frightenedCounter++;
                 _mode = Mode.FRIGHTENED;
 
+                // color of ghosts is changed to show that they're in frightened mode
                 _blinky.changeColor(Color.CYAN);
                 _clyde.changeColor(Color.CYAN);
                 _pinky.changeColor(Color.CYAN);
                 _inky.changeColor(Color.CYAN);
 
+                // after a specific time duration passes, the mode is set back to chase
+                // and the alternating cycle between chase and scatter continues until another
+                // energizer is eaten
                 if(_frightenedCounter == (Constants.FRIGHTENED_MODE_DURATION)/Constants.DURATION){
                     _frightenedCounter = 0;
                     _modeCounter = 0;
 
+                    // color of ghosts is changed to how they originally were
                     _blinky.changeBackColor();
                     _clyde.changeBackColor();
                     _pinky.changeBackColor();
@@ -271,66 +317,71 @@ public class Game {
                 }
             }
         }
-        public void moveGhosts(){
-            switch(_mode){
 
-                case CHASE:
-                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection,_pacmanCoordinate);
-                    _blinky.move(_blinkyDirection);
-
-                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(_pacman.getRowLocation()+Constants.PINKY_CHASE_OFFSET_ROW,_pacman.getColLocation()-Constants.PINKY_CHASE_OFFSET_COL, true));
-                    _pinky.move(_pinkyDirection);
-
-                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(_pacman.getRowLocation()-Constants.CLYDE_CHASE_OFFSET_ROW,_pacman.getColLocation(), true));
-                    _clyde.move(_clydeDirection);
-
-                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(_pacman.getRowLocation(),_pacman.getColLocation()+Constants.INKY_CHASE_OFFSET_COL,true));
-                    _inky.move(_inkyDirection);
-                    break;
-                case SCATTER:
-                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, new BoardCoordinate(0,0, true));
-                    _blinky.move(_blinkyDirection);
-
-                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(0,Constants.MAZE_DIMENSION, true));
-                    _pinky.move(_pinkyDirection);
-
-                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(Constants.MAZE_DIMENSION,0, true));
-                    _clyde.move(_clydeDirection);
-
-                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(Constants.MAZE_DIMENSION,Constants.MAZE_DIMENSION, true));
-                    _inky.move(_inkyDirection);
-                    break;
-                case FRIGHTENED:
-                    _blinkyDirection = _blinky.randomDirection(_blinkyCoordinate, _blinkyDirection);
-                    _blinky.move(_blinkyDirection);
-
-                    _pinkyDirection = _pinky.randomDirection(_pinkyCoordinate, _pinkyDirection);
-                    _pinky.move(_pinkyDirection);
-
-                    _clydeDirection = _clyde.randomDirection(_clydeCoordinate, _clydeDirection);
-                    _clyde.move(_clydeDirection);
-
-                    _inkyDirection = _inky.randomDirection(_inkyCoordinate, _inkyDirection);
-                    _inky.move(_inkyDirection);
-                    break;
-            }
-        }
-
-        public void checkForCollision() {
+        /**
+         * Collisions are checked for by retrieving the arraylist of the
+         * MazeSquare that pacman is currently located on and looping through it
+         * to check for any object that implements the collidable interface.
+         * The object is removed from the arraylist and is instructed to execute its
+         * collide method.
+         */
+        private void checkForCollision() {
             int pacmanRow = _pacmanCoordinate.getRow();
             int pacmanColumn = _pacmanCoordinate.getColumn();
 
             MazeSquare currentSquare = _map[pacmanRow][pacmanColumn];
 
             while(currentSquare.getSquareElements().size() != 0){
-                Collidable collidable;
-                collidable = (Collidable) currentSquare.getSquareElements().remove(currentSquare.getSquareElements().size()-1);
+                Collidable collidable = (Collidable) currentSquare.getSquareElements().remove(currentSquare.getSquareElements().size()-1);
                 collidable.collide();
             }
         }
-    }
 
-    public boolean ifNoMoreDots() {
+        /**
+         * The directions that the ghosts are moved in are set
+         * according to the mode that the game is currently in.
+         * The set directions are then passed into the ghost move methods.
+         */
+        private void moveGhosts(){
+            switch(_mode){
+                case CHASE:
+                    // target location is either pacman or a coordinate close to pacman
+                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection,_pacmanCoordinate);
+                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(_pacman.getRowLocation()+Constants.PINKY_CHASE_OFFSET_ROW,_pacman.getColLocation()-Constants.PINKY_CHASE_OFFSET_COL, true));
+                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(_pacman.getRowLocation()-Constants.CLYDE_CHASE_OFFSET_ROW,_pacman.getColLocation(), true));
+                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(_pacman.getRowLocation(),_pacman.getColLocation()+Constants.INKY_CHASE_OFFSET_COL,true));
+                    break;
+                case SCATTER:
+                    // target location is a corner of the board
+                    _blinkyDirection = _blinky.ghostBFS(_blinkyCoordinate, _blinkyDirection, new BoardCoordinate(0,0, true));
+                    _pinkyDirection = _pinky.ghostBFS(_pinkyCoordinate, _pinkyDirection, new BoardCoordinate(0,Constants.MAZE_DIMENSION, true));
+                    _clydeDirection = _clyde.ghostBFS(_clydeCoordinate, _clydeDirection, new BoardCoordinate(Constants.MAZE_DIMENSION,0, true));
+                    _inkyDirection = _inky.ghostBFS(_inkyCoordinate, _inkyDirection, new BoardCoordinate(Constants.MAZE_DIMENSION,Constants.MAZE_DIMENSION, true));
+                    break;
+                case FRIGHTENED:
+                    // target location is randomly-chosen based on the valid direction that is randomly-chosen
+                    _blinkyDirection = _blinky.randomDirection(_blinkyCoordinate, _blinkyDirection);
+                    _pinkyDirection = _pinky.randomDirection(_pinkyCoordinate, _pinkyDirection);
+                    _clydeDirection = _clyde.randomDirection(_clydeCoordinate, _clydeDirection);
+                    _inkyDirection = _inky.randomDirection(_inkyCoordinate, _inkyDirection);
+                    break;
+            }
+
+            _blinky.move(_blinkyDirection);
+            _pinky.move(_pinkyDirection);
+            _clyde.move(_clydeDirection);
+            _inky.move(_inkyDirection);
+        }
+    }
+    
+    /**
+     * This private method loops through the 2D map array to check
+     * the arraylist of each MazeSquare for the presence of
+     * a dot or energizer at an index. It returns true
+     * if no dots/energizers are found and is used to check
+     * whether the game is over.
+     */
+    private boolean noMoreDotsOrEnergizers() {
         for (int row = 0; row < Constants.MAZE_DIMENSION; row++) {
             for (int col = 0; col < Constants.MAZE_DIMENSION; col++) {
                 for(int i = 0; i < _map[row][col].getSquareElements().size(); i++){
@@ -343,40 +394,76 @@ public class Game {
         return true;
     }
 
+    /**
+     * This method returns true when no more dots/energizers
+     * remain on the map and when the pacman is out of lives.
+     * It is public as it used in the GhostPen class.
+     */
     public boolean gameIsOver(){
-        if(ifNoMoreDots() || _outOfLives){
+        if(noMoreDotsOrEnergizers() || _outOfLives){
             return true;
         } else {
             return false;
         }
     }
 
+    /**
+     * This public method checks whether the frightened Mode boolean
+     * variable is set to true. It is used by the Ghost class in its
+     * collide method.
+     */
     public boolean isInFrightenedMode() {
         return _frightenedMode;
     }
 
+    /**
+     * This public method activates frightened mode.
+     * It is used in the Energizer class in its
+     * collide method.
+     */
     public void setFrightenedMode(){
         _frightenedMode = true;
     }
 
+    /**
+     * This public method is used by dots, energizers and ghosts
+     * to increment the score.
+     */
     public void addToScore(int scoreIncrement){
         _score = _score + scoreIncrement;
     }
 
+
+    /**
+     * This public method is executed by the ghost's collide method
+     * when pacman collides with a ghost and the ghost is not in
+     * frightened mode.
+     */
     public void killPacman(){
+        // if the lives counter is not on
+        // the pacman's last life, a life is deducted 
+        // and the game is reset
         if(_lives > Constants.LAST_LIFE){
             _lives--;
             this.resetGame();
+
+        // if the lives counter is on
+        // the pacman's last life, a life is deducted
+        // and the game is ended.
         } else {
             _lives--;
             endGame();
+
+            // the label is set up now as opposed to in the TimeHandler handle method
+            // as this ensures that the label is displayed exactly when the collision occurs
             this.setUpGameIsOverLabel();
 
+            // allows gameIsOver method to recognize that pacman has no remaining lives
             _outOfLives = true;
         }
     }
 
-    public void resetGame(){
+    private void resetGame(){
         _map[_blinky.getRowLocation()][_blinky.getColLocation()].getSquareElements().remove(_blinky);
         _map[_pinky.getRowLocation()][_pinky.getColLocation()].getSquareElements().remove(_pinky);
         _map[_clyde.getRowLocation()][_clyde.getColLocation()].getSquareElements().remove(_clyde);
@@ -399,7 +486,7 @@ public class Game {
         _pen.addToPen(_clyde);
     }
 
-    public void endGame(){
+    private void endGame(){
         _blinky.changeBackColor();
         _clyde.changeBackColor();
         _pinky.changeBackColor();
@@ -412,10 +499,6 @@ public class Game {
         _clyde.setLocation(Constants.CLYDE_STARTING_ROW,Constants.CLYDE_STARTING_COL);
     }
 
-    public GhostPen getPen(){
-        return _pen;
-    }
-
     private void setUpGameIsOverLabel(){
         Label label = new Label();
         label.setText("Game Over!");
@@ -424,6 +507,10 @@ public class Game {
         label.setTextFill(Color.rgb(255, 255, 0));
         label.setFont(new Font("Arial", Constants.GAME_IS_OVER_FONT_SIZE));
         _boardPane.getChildren().add(label);
+    }
+
+    public GhostPen getPen(){
+        return _pen;
     }
 }
 

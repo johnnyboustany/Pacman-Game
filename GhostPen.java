@@ -47,7 +47,6 @@ public class GhostPen {
             if(_game.gameIsOver()){
                 _timeline.stop();
             } else {
-
                 if(!_ghostPen.isEmpty()){
                     _penCounter++;
 
