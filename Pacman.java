@@ -25,7 +25,7 @@ public class Pacman {
     }
 
     /**
-     * This method makes the pacman move based on
+     * This method makes the pacman move to a new, valid location based on
      * a passed in direction.
      */
     public void move(Direction direction){
@@ -54,17 +54,17 @@ public class Pacman {
         }
 
     /**
-     * This method checks whether the a move will result in
+     * This method checks whether the move will result in
      * a new position that is valid (is not occupied by a wall).
      */
     public boolean moveIsValid(int rowOffset, int colOffset){
-        int yLocation = (this.getRowLocation() + rowOffset)*Constants.SQUARE_WIDTH+(Constants.SQUARE_WIDTH/2);
-        int xLocation = (this.getColLocation() + colOffset)*Constants.SQUARE_WIDTH+(Constants.SQUARE_WIDTH/2);
+        int row = this.getRowLocation() + rowOffset;
+        int col = this.getColLocation() + colOffset;
 
-        if(_map[yLocation/Constants.SQUARE_WIDTH][xLocation/Constants.SQUARE_WIDTH].isWall()){
+        if (_map[row][col].isWall()) {
             return false;
         }
-      return true;
+        return true;
     }
 
     /**
@@ -78,19 +78,19 @@ public class Pacman {
     }
 
     /**
-     * This method allows the column number of the pacman's location to
-     * be retrieved.
-     */
-    public int getColLocation(){
-        return (int) (_pacman.getCenterX()/Constants.SQUARE_WIDTH);
-    }
-
-    /**
      * This method allows the row number of the pacman's location to
      * be retrieved.
      */
     public int getRowLocation(){
         return (int) (_pacman.getCenterY()/Constants.SQUARE_WIDTH);
+    }
+
+    /**
+     * This method allows the column number of the pacman's location to
+     * be retrieved.
+     */
+    public int getColLocation(){
+        return (int) (_pacman.getCenterX()/Constants.SQUARE_WIDTH);
     }
 
     /**

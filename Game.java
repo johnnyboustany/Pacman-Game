@@ -293,24 +293,12 @@ public class Game {
                 _frightenedCounter++;
                 _mode = Mode.FRIGHTENED;
 
-                // color of ghosts is changed to show that they're in frightened mode
-                _blinky.changeColor(Color.CYAN);
-                _clyde.changeColor(Color.CYAN);
-                _pinky.changeColor(Color.CYAN);
-                _inky.changeColor(Color.CYAN);
-
                 // after a specific time duration passes, the mode is set back to chase
                 // and the alternating cycle between chase and scatter continues until another
                 // energizer is eaten
                 if(_frightenedCounter == (Constants.FRIGHTENED_MODE_DURATION)/Constants.DURATION){
                     _frightenedCounter = 0;
                     _modeCounter = 0;
-
-                    // color of ghosts is changed to how they originally were
-                    _blinky.changeBackColor();
-                    _clyde.changeBackColor();
-                    _pinky.changeBackColor();
-                    _inky.changeBackColor();
 
                     _mode = _mode.CHASE;
                     _frightenedMode = false;
@@ -360,10 +348,10 @@ public class Game {
                     break;
                 case FRIGHTENED:
                     // target location is randomly-chosen based on the valid direction that is randomly-chosen
-                    _blinkyDirection = _blinky.randomDirection(_blinkyCoordinate, _blinkyDirection);
-                    _pinkyDirection = _pinky.randomDirection(_pinkyCoordinate, _pinkyDirection);
-                    _clydeDirection = _clyde.randomDirection(_clydeCoordinate, _clydeDirection);
-                    _inkyDirection = _inky.randomDirection(_inkyCoordinate, _inkyDirection);
+                    _blinkyDirection = _blinky.ghostFrightened(_blinkyCoordinate, _blinkyDirection);
+                    _pinkyDirection = _pinky.ghostFrightened(_pinkyCoordinate, _pinkyDirection);
+                    _clydeDirection = _clyde.ghostFrightened(_clydeCoordinate, _clydeDirection);
+                    _inkyDirection = _inky.ghostFrightened(_inkyCoordinate, _inkyDirection);
                     break;
             }
 
@@ -506,10 +494,10 @@ public class Game {
         // this ensures that the game ends with the ghosts
         // displaying their original colors (and not cyan blue,
         // if the game ends wih the ghosts in frightened mode)
-        _blinky.changeBackColor();
-        _clyde.changeBackColor();
-        _pinky.changeBackColor();
-        _inky.changeBackColor();
+        _blinky.setToOriginalColor();
+        _clyde.setToOriginalColor();
+        _pinky.setToOriginalColor();
+        _inky.setToOriginalColor();
 
         // ghosts are returned to their starting positions
         _pacman.setLocation(Constants.PACMAN_STARTING_ROW,Constants.PACMAN_STARTING_COL);
