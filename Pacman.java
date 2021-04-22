@@ -14,8 +14,9 @@ public class Pacman {
     private MazeSquare[][] _map;
 
     /**
-     * The Pacman class uses the 2D map array from the Game class
-     * in its move and moveIsValid methods.
+     * The Pacman constructor stores the 2D map array from the Game class in an
+     * instance variable. It is used in the pacman's
+     * move and moveIsValid methods.
      */
     public Pacman(MazeSquare[][] _map2D){
         _map = _map2D;

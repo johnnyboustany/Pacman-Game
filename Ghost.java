@@ -9,7 +9,7 @@ import java.util.LinkedList;
 /**
  * The Ghost class creates the shape of the ghost.
  * This is a wrapper class that contains
- * a ghost. It implements the Collidable interface as it
+ * a rectangle. It implements the Collidable interface as it
  * defines the collide method.
  */
 public class Ghost implements Collidable {
@@ -20,8 +20,9 @@ public class Ghost implements Collidable {
     private String _ghostName;
 
     /**
-     * The Ghost class uses the 2D map array from the Game class
-     * in its move and moveIsValid methods. It is associated with the Game
+     * The Ghost constructor stores the 2D map array from the Game class in an
+     * instance variable. It is used in the ghost's
+     * move and moveIsValid methods. The ghost is associated with the Game
      * class to allow it to increment the score, access the pen and cause
      * Pacman to lose a life when it collides with a non-frightened ghost.
      */
