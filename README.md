@@ -1,5 +1,5 @@
-# Pacman-Game
-README
+# Pacman-Game README
+
 
 ## Overview:
 
@@ -33,7 +33,7 @@ Frightened mode is achieved through checking the neighbors of the ghost and addi
 A random number that is less than the size of the arraylist is generated and is used to pick a valid direction. This
 direction then gets passed into the move method.
 
-# Design Choices:
+## Design Choices:
 
 Polymorphism is taken full advantage of as each MazeSquare contains an arraylist of type Collidable
 and the Game class loops through the arraylist of each square that pacman is currently located on.
