@@ -2,18 +2,21 @@
 README
 
 # Overview:
-    The App class instantiates the PaneOrganizer, which in turn
+
+The App class instantiates the PaneOrganizer, which in turn
 instantiates the BorderPane. It also instantiates a vanilla Pane (boardPane)
 and an HBox, and  respectively sets them to the top and bottom of the BorderPane. The button
 added to the HBox is associated with a QuitHandler, allowing the user to exit from the game.
 The Sidebar class is instantiated in the PaneOrganizer and is used to display the score and lives
 labels. The top-level logic class Game is also instantiated and boardPane is passed in.
 This allows the Game class to graphically add various nodes to the boardPane.
-    In the Game constructor, it instantiates a 2D Array of MazeSquares that represents the board.
+
+In the Game constructor, it instantiates a 2D Array of MazeSquares that represents the board.
 Also, it sets up the board with the pacman, 4 ghosts, dots and energizers. Three of the ghosts
 start out in the GhostPen and are gradually released both from the queue in the GhostPen class and also
 graphically.
-    Game has a TimeHandler private class which controls the switching between chase and scatter mode,
+
+Game has a TimeHandler private class which controls the switching between chase and scatter mode,
 moves the pacman and ghosts, checks for collisions and updates the score and lives labels. It also
 is in charge of setting the mode to frightened mode when pacman eats an energizer. Moreover, it checks
 whether the game is over (in that case, it stops the timeline and displays a Game is Over label).
@@ -32,7 +35,7 @@ direction then gets passed into the move method.
 
 # Design Choices:
 
-    Polymorphism is taken full advantage of as each MazeSquare contains an arraylist of type Collidable
+Polymorphism is taken full advantage of as each MazeSquare contains an arraylist of type Collidable
 and the Game class loops through the arraylist of each square that pacman is currently located on.
 The Collidable interface is implemented by dots, energizers and ghosts, which all define their collide()
 and getType() methods. All these 3 classes are associated with Game and are passed the instance of game in
@@ -47,16 +50,18 @@ that characterizes the object. It has 2 purposes:
  whether the object's getType() method returns "dot" or "energizer." This is used in a helper method in Game
  that checks every MazeSquare on the board for dots or energizers, in order to know when the board no longer has
  any dots/energizers (and, hence, when the game should end).
-     Side Note:
-     Although it might be seen as inefficient to use for loops to check for if the game is over, it's neat and compact
-     (unlike the approach of using counters to determine when all dots/energizers have been removed). So, there are
-     tradeoffs for both design choices and it depends on the programmer's priorities
-     (minimizing the number of operations executed vs. cleanliness and compactness of code).
+
+Side Note:
+
+Although it might be seen as inefficient to use for loops to check for if the game is over, it's neat and compact
+(unlike the approach of using counters to determine when all dots/energizers have been removed). So, there are
+tradeoffs for both design choices and it depends on the programmer's priorities
+(minimizing the number of operations executed vs. cleanliness and compactness of code).
 
  2- It allows the GhostPen to set each ghost to a certain position inside the pen according to their type.
  It checks whether getType() returns "blinky," "inky," clyde," or "pinky."
 
-    The GhostPen uses a counter to know when to release a ghost graphically and from the queue. It increments the
+The GhostPen uses a counter to know when to release a ghost graphically and from the queue. It increments the
 counter whenever the queue isn't empty. In frightened mode, the collide method from the Ghost class adds its
 ghost to the pen. Pinky, Inky and Clyde are added back to the pen whenever the game is reset (when pacman loses a life).
 
