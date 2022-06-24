@@ -9,16 +9,16 @@ Overview:
     The Sidebar class is instantiated in the PaneOrganizer and is used to display the score and lives
     labels. The top-level logic class Game is also instantiated and boardPane is passed in.
     This allows the Game class to graphically add various nodes to the boardPane.
-
+    
     In the Game constructor, it instantiates a 2D Array of MazeSquares that represents the board.
     Also, it sets up the board with the pacman, 4 ghosts, dots and energizers. Three of the ghosts
     start out in the GhostPen and are gradually released both from the queue in the GhostPen class and also
     graphically.
-
+    
     Game has a TimeHandler private class which controls the switching between chase and scatter mode,
     moves the pacman and ghosts, checks for collisions and updates the score and lives labels. It also
     is in charge of setting the mode to frightened mode when pacman eats an energizer. Moreover, it checks
-     whether the game is over (in that case, it stops the timeline and displays a Game is Over label).
+    whether the game is over (in that case, it stops the timeline and displays a Game is Over label).
 
     Game also has a KeyHandler private class which allows the user to choose the direction that pacman
     moves in through using the LEFT, RIGHT, UP and DOWN keys. It only updates the direction instance variable
