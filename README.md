@@ -46,10 +46,11 @@ pacman has.
 
 The getType() method that is defined by all three objects that implement Collidable returns a string
 that characterizes the object. It has 2 purposes:
- 1- It allows Game to check whether a given MazeSquare's arraylist contains a dot or energizer by checking
- whether the object's getType() method returns "dot" or "energizer." This is used in a helper method in Game
- that checks every MazeSquare on the board for dots or energizers, in order to know when the board no longer has
- any dots/energizers (and, hence, when the game should end).
+
+1- It allows Game to check whether a given MazeSquare's arraylist contains a dot or energizer by checking
+whether the object's getType() method returns "dot" or "energizer." This is used in a helper method in Game
+that checks every MazeSquare on the board for dots or energizers, in order to know when the board no longer has
+any dots/energizers (and, hence, when the game should end).
 
 Side Note:
 
@@ -58,14 +59,14 @@ Although it might be seen as inefficient to use for loops to check for if the ga
 tradeoffs for both design choices and it depends on the programmer's priorities
 (minimizing the number of operations executed vs. cleanliness and compactness of code).
 
- 2- It allows the GhostPen to set each ghost to a certain position inside the pen according to their type.
- It checks whether getType() returns "blinky," "inky," clyde," or "pinky."
+2- It allows the GhostPen to set each ghost to a certain position inside the pen according to their type.
+It checks whether getType() returns "blinky," "inky," clyde," or "pinky."
 
 The GhostPen uses a counter to know when to release a ghost graphically and from the queue. It increments the
 counter whenever the queue isn't empty. In frightened mode, the collide method from the Ghost class adds its
 ghost to the pen. Pinky, Inky and Clyde are added back to the pen whenever the game is reset (when pacman loses a life).
 
-    When pacman is out of lives, the killPacman() method that is called from the collide method of the Ghost class brings
+When pacman is out of lives, the killPacman() method that is called from the collide method of the Ghost class brings
 pacman and all ghosts back to their starting positions (using endGame()) and displays the game is over label.
 However, the endGame() method is still called in the TimeHandler handle method for all cases of the game being over
 (including for when pacman is out of lives). Although this seems redundant, it makes sure that there is no delay
@@ -74,6 +75,6 @@ Nevertheless, the game is over label is only displayed for the case of no more
 dots/energizers as the label is already being displayed for the case of pacman losing lives in the killPacman() method.
 
 # Additional Feature:
-    Two seconds before frightened mode is over, the ghosts blink  (turn white). This is achieved in the
+Two seconds before frightened mode is over, the ghosts blink  (turn white). This is achieved in the
 setMode() method of the Game class and is done by checking whether the frightened counter is 2 seconds away from
 frightened mode ending and acting accordingly (changing the color to white).
