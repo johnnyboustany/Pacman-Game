@@ -1,7 +1,7 @@
-## Pacman-Game
+# Pacman-Game
 README
 
-# Overview:
+## Overview:
 
 The App class instantiates the PaneOrganizer, which in turn
 instantiates the BorderPane. It also instantiates a vanilla Pane (boardPane)
@@ -52,7 +52,7 @@ whether the object's getType() method returns "dot" or "energizer." This is used
 that checks every MazeSquare on the board for dots or energizers, in order to know when the board no longer has
 any dots/energizers (and, hence, when the game should end).
 
-Side Note:
+### Side Note:
 
 Although it might be seen as inefficient to use for loops to check for if the game is over, it's neat and compact
 (unlike the approach of using counters to determine when all dots/energizers have been removed). So, there are
@@ -74,7 +74,7 @@ and that pacman and the ghosts are all in their places and don't move at all whe
 Nevertheless, the game is over label is only displayed for the case of no more
 dots/energizers as the label is already being displayed for the case of pacman losing lives in the killPacman() method.
 
-# Additional Feature:
+## Additional Feature:
 Two seconds before frightened mode is over, the ghosts blink  (turn white). This is achieved in the
 setMode() method of the Game class and is done by checking whether the frightened counter is 2 seconds away from
 frightened mode ending and acting accordingly (changing the color to white).
