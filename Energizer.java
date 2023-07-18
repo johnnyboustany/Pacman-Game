@@ -10,6 +10,7 @@ import javafx.scene.shape.Circle;
  * a circle. It implements the Collidable interface as it
  * defines the collide method.
  */
+
 public class Energizer implements Collidable{
     private Circle _energizer;
     private Pane _boardPane;
