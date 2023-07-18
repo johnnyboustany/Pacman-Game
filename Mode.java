@@ -3,7 +3,6 @@ package pacman;
 public enum Mode {
 
     SCATTER, CHASE, FRIGHTENED;
-
     public Mode opposite(){
         switch(this){
             case CHASE: return SCATTER;
