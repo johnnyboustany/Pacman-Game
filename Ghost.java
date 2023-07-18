@@ -12,6 +12,7 @@ import java.util.LinkedList;
  * a rectangle. It implements the Collidable interface as it
  * defines the collide method.
  */
+
 public class Ghost implements Collidable {
     private Rectangle _ghost;
     private Color _color;
