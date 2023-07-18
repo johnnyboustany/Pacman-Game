@@ -7,7 +7,6 @@ package pacman;
  *  method dictates what happens when they collide with pacman
  *  and getType is used to know the type of the collidable
  *  (dot, energizer or type of ghost).
- *
  */
 public interface Collidable {
     void collide(); // each object that implements this interface defines their own collide method
