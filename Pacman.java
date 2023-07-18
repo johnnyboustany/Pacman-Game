@@ -3,7 +3,6 @@ package pacman;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-
 /**
  * The Pacman class creates the shape of the pacman.
  * This is a wrapper class that contains
