@@ -20,6 +20,7 @@ public class Dot implements Collidable{
      * graphically add its circle to it. It is associated with the Game
      * class to allow it to increment the score.
      */
+    
     public Dot(Pane boardPane, Game game){
         _boardPane = boardPane;
         _game = game;
