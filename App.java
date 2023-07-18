@@ -9,7 +9,6 @@ import javafx.stage.Stage;
  * to be instantiated. It passes in the root pane from the instance of the PaneOrganizer into
  * the constructor of the scene. This allows the stage to set the scene, which will be used to
  * display the Pacman game.
- *
  */
 public class App extends Application {
 
