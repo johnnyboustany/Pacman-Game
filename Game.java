@@ -21,6 +21,7 @@ import javafx.util.Duration;
  * Also, it sets up the board with the 4 ghosts and adds 3 of them
  * to the ghost pen.
  */
+
 public class Game {
     private MazeSquare[][] _map;
     private Pane _boardPane;
