@@ -1,5 +1,6 @@
-# Pacman-Game README
+# Pacman-Game
 
+Welcome to the Pacman-Game project, where the classic arcade game Pacman comes to life with a new level of challenge and excitement! This implementation showcases intelligent algorithms for ghost behavior and efficient game management, providing players with an engaging and nostalgic gaming experience.
 
 ## Overview:
 
