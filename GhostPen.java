@@ -13,6 +13,7 @@ import java.util.LinkedList;
  * released from the pen at the start of the game and ghosts are returned to (and later removed from)
  * the pen when they are eaten during frightened mode.
  */
+
 public class GhostPen {
     private int _penCounter;
     private Ghost _pinky;
