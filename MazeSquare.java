@@ -11,6 +11,7 @@ import java.util.ArrayList;
  * a rectangle. It can check whether it is a wall or not. It can also
  * check for whether it contains a dot or energizer.
  */
+
 public class MazeSquare {
     private Rectangle _rect;
     private ArrayList<Collidable> _squareElements;
