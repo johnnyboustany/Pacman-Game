@@ -15,7 +15,6 @@ import javafx.scene.layout.Pane;
  *  A new instance of the Game class is passed in a boardPane. The PaneOrganizer
  *  class has a method that sets up the button, which is used to display the Quit button,
  *  allowing the user to exit from the game.
- *
  */
 public class PaneOrganizer {
     private BorderPane _root;
