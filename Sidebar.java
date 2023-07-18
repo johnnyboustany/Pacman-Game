@@ -10,7 +10,6 @@ import javafx.scene.text.Font;
  *  The Sidebar class takes in an HBox from
  *  the PaneOrganizer class and adds 2 labels to it
  *  that are updated throughout the game.
- *
  */
 public class Sidebar {
     private HBox _sidebarPane;
